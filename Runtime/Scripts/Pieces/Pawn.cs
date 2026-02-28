@@ -24,7 +24,9 @@ namespace Andrey04o.Chess {
             if (checkEnPassant == false) {
                 piece.AddCellAttack(dir);
             } else {
-                if (piece.GetCurrentCell().GetNeighbourByOffset(dir).pieceEnPassant != null) {
+                Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
+                if (cell == null) return;
+                if (cell.pieceEnPassant != null) {
                     piece.gameField.AddMove(piece.gameField.enPassantCell);
                 }
             }
@@ -74,8 +76,24 @@ namespace Andrey04o.Chess {
                 cell.pieceEnPassant.PerformCapture();
             }
             base.PerformMove(cell, piece);
-            if (Mathf.Abs(piece.GetCurrentCellPrevious().position - cell.position) > 8) {
-                piece.gameField.SetEnPassant(piece);
+            Cell cell1;
+            cell1 = piece.GetCurrentCellPrevious();
+            if (piece.isBlack) {
+                cell1 = cell1.GetUp();
+                if (cell1 == null) return;
+                cell1 = cell1.GetUp();
+                if (cell1 == null) return;
+                if (piece.GetCurrentCell().position == cell1.position) {
+                    piece.gameField.SetEnPassant(piece);
+                }
+            } else {
+                cell1 = cell1.GetDown();
+                if (cell1 == null) return;
+                cell1 = cell1.GetDown();
+                if (cell1 == null) return;
+                if (piece.GetCurrentCell().position == cell1.position) {
+                    piece.gameField.SetEnPassant(piece);
+                }
             }
         }
     }

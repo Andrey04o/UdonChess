@@ -90,6 +90,7 @@ namespace Andrey04o.Chess {
         public void PerformCapture() {
             if (isCaptured == 1) {
                 meshRenderer.enabled = false;
+                GetCurrentCell().pieceCurrent = null;
                 //RemoveAttack();
             }
         }
