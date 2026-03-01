@@ -6,23 +6,23 @@ using System;
 namespace Andrey04o.Chess {
     public class Pawn : Piece
     {
-        public override void CalcAttack(Piece piece)
+        public override void CalcAttack(Piece piece, bool isRemove = false)
         {
             base.CalcAttack(piece);
-            CheckAttack(piece, false);
+            CheckAttack(piece, false, isRemove);
         }
-        void CheckAttack(Piece piece, bool checkEnPassant) {
+        void CheckAttack(Piece piece, bool checkEnPassant, bool isRemove = false) {
             if (piece.isBlack) {
-                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(1,1));
-                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(-1,1));
+                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(1,1), isRemove);
+                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(-1,1), isRemove);
             } else {
-                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(1,-1));
-                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(-1,-1));
+                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(1,-1), isRemove);
+                AddCellAttackPawn(piece, checkEnPassant, new Vector2Int(-1,-1), isRemove);
             }
         }
-        void AddCellAttackPawn(Piece piece, bool checkEnPassant, Vector2Int dir) {
+        void AddCellAttackPawn(Piece piece, bool checkEnPassant, Vector2Int dir, bool isRemove) {
             if (checkEnPassant == false) {
-                piece.AddCellAttack(dir);
+                piece.AddCellAttack(dir, isRemove);
             } else {
                 Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
                 if (cell == null) return;

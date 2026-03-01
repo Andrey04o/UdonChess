@@ -5,17 +5,17 @@ using UdonSharp;
 namespace Andrey04o.Chess {
     public class King : Piece
     {
-        public override void CalcAttack(Piece piece)
+        public override void CalcAttack(Piece piece, bool isRemove = false)
         {
             base.CalcAttack(piece);
-            piece.AddCellAttack(new Vector2Int(1,1));
-            piece.AddCellAttack(new Vector2Int(-1,1));
-            piece.AddCellAttack(new Vector2Int(1,-1));
-            piece.AddCellAttack(new Vector2Int(-1,-1));
-            piece.AddCellAttack(new Vector2Int(1,0));
-            piece.AddCellAttack(new Vector2Int(-1,0));
-            piece.AddCellAttack(new Vector2Int(0,1));
-            piece.AddCellAttack(new Vector2Int(0,-1));
+            piece.AddCellAttack(new Vector2Int(1,1), isRemove);
+            piece.AddCellAttack(new Vector2Int(-1,1), isRemove);
+            piece.AddCellAttack(new Vector2Int(1,-1), isRemove);
+            piece.AddCellAttack(new Vector2Int(-1,-1), isRemove);
+            piece.AddCellAttack(new Vector2Int(1,0), isRemove);
+            piece.AddCellAttack(new Vector2Int(-1,0), isRemove);
+            piece.AddCellAttack(new Vector2Int(0,1), isRemove);
+            piece.AddCellAttack(new Vector2Int(0,-1), isRemove);
         }
         public override void ShowMove(Piece piece)
         {
@@ -86,22 +86,67 @@ namespace Andrey04o.Chess {
                 if (cell.castling == 0) return;
                 castling = true;
             }
-            base.PerformMove(cell, piece);
+            if (GetCastle(cell, out Piece castle, out Cell cellCastle)) {
+                Cell cellCastleOld = castle.GetCurrentCell();
+                Cell cellOld = piece.GetCurrentCell();
+                cellCastleOld.VectorGetPieces();
+                cellCastle.VectorGetPieces();
+                cellOld.VectorGetPieces();
+                cell.VectorGetPieces();
+                
+                piece.GetPiece().CalcAttack(piece, true);
+                cellCastleOld.VectorCalcAttack(true);
+                cellCastle.VectorCalcAttack(true);
+
+                piece.GetPiece().CalcAttack(piece, true);
+                cellOld.VectorCalcAttack(true);
+                cell.VectorCalcAttack(true);
+
+                piece.isNotMoved = 1;
+                castle.isNotMoved = 1;
+                
+                piece.positionPrevious = piece.position;
+                castle.positionPrevious = castle.position;
+                piece.gameField.cells[piece.position].pieceCurrent = null;
+                castle.gameField.cells[castle.position].pieceCurrent = null;
+                piece.position = cell.position;
+                castle.position = cellCastle.position;
+                
+                piece.gameField.HideMove();
+                piece.gameField.ChangeSide();
+
+                cell.PlacePiece(piece);
+                cellCastle.PlacePiece(castle);
+                piece.GetPiece().CalcAttack(piece, false);
+                cellOld.VectorCalcAttack(false);
+                cell.VectorCalcAttack(false);
+                castle.GetPiece().CalcAttack(piece, false);
+                cellCastleOld.VectorCalcAttack(false);
+                cellCastle.VectorCalcAttack(false);
+            }
+            else {
+                base.PerformMove(cell, piece);
+            }
+
         }
-        public override void AfterMove(Cell cell, Piece piece)
-        {
-            base.AfterMove(cell, piece);
-            if (castling == false) return;
+        bool GetCastle(Cell cell, out Piece castle, out Cell castleCell) {
+            castle = null;
+            castleCell = null;
+            if (castling == false) return false;
             castling = false;
-            Piece piece1;
             if (cell.castling == 1) {
-                piece1 = cell.GetLeft().pieceCurrent;
-                PlacePiece(cell.GetRight(), piece1);
+                castle = cell.GetLeft().pieceCurrent;
+                castleCell = cell.GetRight();
+                return true;
+                //PlacePiece(cell.GetRight(), piece1);
             }
             if (cell.castling == 2) {
-                piece1 = cell.GetRight().GetRight().pieceCurrent;
-                PlacePiece(cell.GetLeft(), piece1);
+                castle = cell.GetRight().GetRight().pieceCurrent;
+                castleCell = cell.GetLeft();
+                return true;
+                //PlacePiece(cell.GetLeft(), piece1);
             }
+            return false;
         }
     }
 }

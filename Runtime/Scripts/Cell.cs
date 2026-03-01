@@ -30,6 +30,8 @@ namespace Andrey04o.Chess {
         public TextMeshPro text2;
         public TextMeshPro text3;
         public TextMeshPro text4;
+        Piece[] piecesVector = new Piece[8];
+        public byte piecesVectorCount;
         public void PlacePiece(Piece piece) {
             //gameField.cells[piece.position].pieceCurrent = null;
             pieceCurrent = piece;
@@ -266,10 +268,11 @@ namespace Andrey04o.Chess {
             }
             
         }
-        public void PerformVectorCheck(Piece piece) {
+        public void VectorGetPieces() {
             //meshRenderer.material = materialOrange;
             // Check if this cell has an attack vector
             text4.text = "0";
+            piecesVectorCount = 0;
             if (attackVector == 0) return;
             
             // Iterate through all 8 directions (bits 0-7)
@@ -289,11 +292,17 @@ namespace Andrey04o.Chess {
                 
                 Piece neighbourPiece = neighbourCell.pieceCurrent;
                 Debug.Log("found " + neighbourPiece.name);
-                
+                piecesVector[piecesVectorCount] = neighbourPiece;
+                piecesVectorCount++;
                 // Invoke RemoveAttack and PerformCalcAttack on the found piece
                 neighbourPiece.GetPiece().RemoveAttack(neighbourPiece);
-                neighbourPiece.PerformCalcAttack();
+                neighbourPiece.GetPiece().CalcAttack(neighbourPiece);
                 neighbourCell.meshRenderer.material = materialOrange;
+            }
+        }
+        public void VectorCalcAttack(bool isRemove = false) {
+            for (int i = 0; i < piecesVectorCount; i++) {
+                piecesVector[i].GetPiece().CalcAttack(piecesVector[i], isRemove);
             }
         }
 

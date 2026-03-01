@@ -58,88 +58,105 @@ namespace Andrey04o.Chess {
                 cell = gameField.cells[position];
             }
             pieceGrab.StopGrab();
+
             if (cell != GetCurrentCell()) {
                 isMoved = true;
                 GetPiece().PerformMove(cell,this);
-                //gameField.HideMove();
-                //gameField.ChangeSide();
+                GetPiece().AfterMove(cell,this);
+            } else {
+                cell.PlacePiece(this);
             }
-            //gameField.cells[position].pieceCurrent = null;
-            cell.PlacePiece(this);
-            GetPiece().AfterMove(cell,this);
         }
         virtual public void PerformMove(Cell cell, Piece piece) {
-            //gameField.cells[position].attackBy
-            //RemoveAttack();
-            RemoveAttack(piece);
-            piece.positionPrevious = piece.position;
-            piece.gameField.cells[piece.position].pieceCurrent = null;
-            piece.position = cell.position;
-            
+            Cell cellOld = piece.GetCurrentCell();
+            cellOld.VectorGetPieces();
+            cell.VectorGetPieces();
+
+            piece.GetPiece().CalcAttack(piece, true);
+            cellOld.VectorCalcAttack(true);
+            cell.VectorCalcAttack(true);
+
             piece.isNotMoved = 1;
             if (cell.pieceCurrent != null) {
                 cell.pieceCurrent.isCaptured = 1;
                 cell.pieceCurrent.PerformCapture();
             }
+            
+            piece.positionPrevious = piece.position;
+            piece.gameField.cells[piece.position].pieceCurrent = null;
+            piece.position = cell.position;
+            
             piece.gameField.HideMove();
             piece.gameField.ChangeSide();
-            piece.PerformCalcAttack();
+
+            cell.PlacePiece(piece);
+            
+            piece.GetPiece().CalcAttack(piece, false);
+            cellOld.VectorCalcAttack(false);
+            cell.VectorCalcAttack(false);
         }
         virtual public void AfterMove(Cell cell, Piece piece) {
             if (piece.isMoved == true) {
-                Debug.Log("ismoved");
                 piece.isMoved = false;
-                piece.GetCurrentCellPrevious().PerformVectorCheck(piece);
-                cell.PerformVectorCheck(piece);
             }
         }
         public void PlacePiece(Cell cell, Piece piece) {
-            piece.GetPiece().RemoveAttack(this);
             piece.positionPrevious = piece.position;
             piece.gameField.cells[piece.position].pieceCurrent = null;
             piece.position = cell.position;
             piece.isNotMoved = 1;
             piece.isMoved = true;
             cell.PlacePiece(piece);
-            piece.PerformCalcAttack();
+            piece.GetPiece().CalcAttack(piece);
             piece.GetPiece().AfterMove(cell, piece);
         }
 
         public void PerformCapture() {
             if (isCaptured == 1) {
-                GetPiece().RemoveAttack(this);
+                GetPiece().CalcAttack(this, true);
                 meshRenderer.enabled = false;
                 GetCurrentCell().pieceCurrent = null;
                 //RemoveAttack();
             }
         }
-        public virtual void CalcAttack(Piece piece) {
+        public virtual void CalcAttack(Piece piece, bool isRemove = false) {
 
         }
-        public void AddAttack(Cell cell) {
-            cell.SetAttack(this, true);
+        public void AddAttack(Cell cell, bool isRemove = false) {
+            if (isRemove) dir1Count = 0;
+            cell.SetAttack(this, !isRemove);
             dir1[dir1Count] = cell.position;
             dir1Count++;
         }
+        public void AddAttack(Cell cell, Vector2Int dir, bool isRemove = false) {
+            if (isRemove) dir1Count = 0;
+            cell.SetAttack(this, !isRemove);
+            dir1[dir1Count] = cell.position;
+            dir1Count++;
+            cell.SetAttackVector(dir, !isRemove);
+        }
         virtual public void RemoveAttack(Piece piece) {
+            piece.GetPiece().CalcAttack(piece, false);
+            /*
             for(int i = 0; i < piece.dir1Count; i++) {
                 piece.gameField.cells[piece.dir1[i]].SetAttack(piece, false);
             }
             
             piece.dir1Count = 0;
+            */
         }
-        public void AddCellAttack(Vector2Int dir) {
+        public void AddCellAttack(Vector2Int dir, bool isRemove = false) {
             Cell cell = GetCurrentCell().GetNeighbourByOffset(dir);
             if (cell != null) {
-                AddAttack(cell);
+                AddAttack(cell, isRemove);
             }
         }
-        public void AddSlidingCellAttack(Vector2Int dir) {
+        public void AddSlidingCellAttack(Vector2Int dir, bool isRemove = false) {
             Cell[] cells = GetCurrentCell().GetSlidingCells(dir);
             foreach (Cell cell in cells) {
-                dir2[dir1Count] = dir;
-                AddAttack(cell);
-                cell.SetAttackVector(dir, true);
+                //dir2[dir1Count] = dir;
+                AddAttack(cell, dir, isRemove);
+                //cell.SetAttackVector(dir, true);
             }
         }
         virtual public void ShowMove(Piece piece) {
@@ -149,9 +166,6 @@ namespace Andrey04o.Chess {
         }
         public void PerformShowMove() {
             GetPiece().ShowMove(this);
-        }
-        public void PerformCalcAttack() {
-            GetPiece().CalcAttack(this);
         }
         public Piece GetPiece() {
             return gameField.pieces.GetPiece(indexType);

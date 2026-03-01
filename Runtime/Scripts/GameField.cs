@@ -37,7 +37,7 @@ namespace Andrey04o.Chess {
             if (isAttackCalc == true) return;
             isAttackCalc = true;
             foreach (Piece piece in pieces.InTableAll) {
-                piece.PerformCalcAttack();
+                piece.GetPiece().CalcAttack(piece);
             }
         }
         public void RemoveAttack() {
