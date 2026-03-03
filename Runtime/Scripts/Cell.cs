@@ -27,6 +27,7 @@ namespace Andrey04o.Chess {
         [HideInInspector] public bool isCanMoveHere = false;
         [HideInInspector] public byte castling = 0;
         [HideInInspector] public bool isCheck = false;
+        [HideInInspector] public bool isCheck2 = false;
         public TextMeshPro text1;
         public TextMeshPro text2;
         public TextMeshPro text3;
@@ -151,7 +152,7 @@ namespace Andrey04o.Chess {
                 if (isAttack)
                     piece.gameField.AddMove(this, piece, ignoreKingCheck);
                 else
-                    SetMove(false, piece.gameField.IsKingCheck(ignoreKingCheck));
+                    SetMove(false, piece.gameField.IsKingCheck(ignoreKingCheck), false);
                 return;
             }
             if (isAttack) {
@@ -169,10 +170,33 @@ namespace Andrey04o.Chess {
             attackByCount = 0;
             attackByCountBlack = 0;
         }
-        public bool SetMove(bool isCan, bool isKingCheck) {
+        public bool CheckMove(Piece piece, bool isKingCheck) {
+            bool isCan = false;
+            if (pieceCurrent == null) {
+                isCan = true;
+            } else if (pieceCurrent.isBlack != piece.isBlack){
+                isCan = true;
+            }
+            if (isCan && isKingCheck) {
+                isCan = isCheck;
+            }
+
+            return isCan;
+        }
+        public bool CheckMove(bool isCan, bool isKingCheck) {
+            if (isCan && isKingCheck) {
+                isCan = isCheck;
+            }
+
+            return isCan;
+        }
+        public bool SetMove(bool isCan, bool isKingCheck, bool isKingCheck2) {
             isCanMoveHere = isCan;
             if (isCanMoveHere && isKingCheck) {
                 isCanMoveHere = isCheck;
+            }
+            if (isCanMoveHere && isKingCheck2) {
+                isCanMoveHere = isCheck2;
             }
             if (isCanMoveHere) {
                 SetMaterial(1);
@@ -181,7 +205,7 @@ namespace Andrey04o.Chess {
             }
             return isCanMoveHere;
         }
-        public bool SetMove(Piece piece, bool isKingCheck) {
+        public bool SetMove(Piece piece, bool isKingCheck, bool isKingCheck2) {
             isCanMoveHere = false;
             if (pieceCurrent == null) {
                 isCanMoveHere = true;
@@ -190,6 +214,9 @@ namespace Andrey04o.Chess {
             }
             if (isCanMoveHere && isKingCheck) {
                 isCanMoveHere = isCheck;
+            }
+            if (isCanMoveHere && isKingCheck2) {
+                isCanMoveHere = isCheck2;
             }
             
             if (isCanMoveHere) {
@@ -284,13 +311,11 @@ namespace Andrey04o.Chess {
             }
             
         }
-        public void VectorGetPieces(Piece piece, bool isKingCheck = false) {
-            //meshRenderer.material = materialOrange;
+        public void VectorGetPieces(Piece piece, bool isKingCheck = false, bool checkKingSafe = false) {
             // Check if this cell has an attack vector
             text4.text = "0";
             piecesVectorCount = 0;
             if (attackVector == 0) return;
-            //gameField.ClearCellSliding();
             // Iterate through all 8 directions (bits 0-7)
             for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
                 // Check if this direction has an attack vector
@@ -320,6 +345,54 @@ namespace Andrey04o.Chess {
                 piecesVectorCount++;
 
                 neighbourCell.meshRenderer.material = materialOrange;
+            }
+        }
+        Piece GetKing(Vector2Int movement) {
+                // Find the king
+                Cell neighbourCell = this;
+                for(;;) {
+                    neighbourCell = neighbourCell.GetNeighbourByOffset(movement);
+                    if (neighbourCell == null) return null; // impossible
+                    if (neighbourCell.pieceCurrent != null) break;
+                }
+                Piece king = neighbourCell.pieceCurrent;
+                if (gameField.IsHisTurn(king) == false) return null;
+                if (king.GetPiece() == gameField.pieces.king) {
+                    return king;
+                }
+                return null;
+            }
+        public void VectorCheckKing() {
+            
+            // Check if this cell has an attack vector
+            if (attackVector == 0) return;
+            // Iterate through all 8 directions (bits 0-7)
+            for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
+                // Check if this direction has an attack vector
+                if ((attackVector & (1 << bitPosition)) == 0) continue;
+                
+                Vector2Int movement = GetDirectionFromBitPosition(bitPosition);
+                // Find the king
+                
+                Piece king = GetKing(movement);
+                if (king == null) continue;
+
+                movement = movement * -1;
+                Cell neighbourCell = this;
+                for(;;) {
+                    neighbourCell = neighbourCell.GetNeighbourByOffset(movement);
+                    if (neighbourCell == null) return; // impossible
+                    gameField.AddCellCheck2(neighbourCell);
+                    if (neighbourCell.pieceCurrent != null) break;
+                }
+                Piece neighbourPiece = neighbourCell.pieceCurrent;
+                
+                if (neighbourPiece.isBlack == king.isBlack) {
+                    Debug.Log("reset, king in " + king.GetCurrentCell().name + " movement " + movement + " found piece " + neighbourCell.name);
+                    gameField.ResetCellsCheck2();
+                    return;
+                }
+                Debug.Log("resetnot, king in " + king.GetCurrentCell().name + " movement " + movement + " found piece " + neighbourCell.name);
             }
         }
         /*

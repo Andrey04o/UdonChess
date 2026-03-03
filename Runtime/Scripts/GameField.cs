@@ -25,8 +25,13 @@ namespace Andrey04o.Chess {
         public byte piecesMoveCount = 0;
         public byte isKingCheck = 0;
         public Cell[] cellsNeedDefend = new Cell[27];
+        public Cell[] cellsNeedDefend2 = new Cell[27];
         public byte cellsNeedDefendCount = 0;
+        public byte cellsNeedDefendCount2 = 0;
         public byte pieceAttackKing;
+        public byte countPossibleMoves = 0;
+        public bool isStalemateCheck = false;
+        public byte isStalemate = 0;
         
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -63,13 +68,27 @@ namespace Andrey04o.Chess {
             }
         }
         public void AddMove(Cell cell, bool ignoreKingCheck = false) {
-            if (cell.SetMove(true, IsKingCheck(ignoreKingCheck) == true)) {
+            if (isStalemateCheck) {
+                if (cell.CheckMove(true, IsKingCheck(ignoreKingCheck))) {
+                    countPossibleMoves++;
+                }
+                return;
+            }
+            if (cell.SetMove(true, IsKingCheck(ignoreKingCheck), IsUnderAttack())) {
                 dirMove[dirMoveCount] = cell.position;
                 dirMoveCount++;
             }
         }
+        bool isKingBeDanger = false;
+        void CheckKingSafe(Cell cell, Piece piece) {
+            piece.GetCurrentCell().VectorCheckKing();
+        }
         public void AddMove(Cell cell, Piece piece, bool ignoreKingCheck = false) {
-            if (cell.SetMove(piece, IsKingCheck(ignoreKingCheck)) == true) {
+            CheckKingSafe(cell, piece);
+            SetCellsToCheck2();
+            
+            Debug.Log("checksafe " + cellsNeedDefendCount2);
+            if (cell.SetMove(piece, IsKingCheck(ignoreKingCheck),IsUnderAttack())) {
                 dirMove[dirMoveCount] = cell.position;
                 dirMoveCount++;
                 //PerformCheckIsKing(cell)
@@ -89,7 +108,7 @@ namespace Andrey04o.Chess {
         }
         void ShowMove(Piece piece) {
             for(int i = 0; i < dirMoveCount; i++) {
-                cells[dirMove[i]].SetMove(piece, IsKingCheck());
+                cells[dirMove[i]].SetMove(piece, IsKingCheck(), false);
             }
         }
         public void SetEnPassant(Piece piece) {
@@ -202,7 +221,33 @@ namespace Andrey04o.Chess {
             ChangeSide();
             ResetChangedCell();
             ResetCellsCheck();
+            ResetStalemate();
+            CheckStalemate();
             CheckKing();
+            PerformGameOver();
+        }
+        public void CheckStalemate() {
+            //isStalemateCheck = true;
+            countPossibleMoves = 0;
+            foreach(Piece piece in pieces.InTableAll) {
+                if (IsHisTurn(piece) == false) continue;
+                if (piece.isCaptured == 1) continue;
+                piece.ShowMove(piece);
+                Debug.Log(piece.GetCurrentCell().name);
+                if (dirMoveCount != 0) {
+                    Debug.Log("no stalemate");
+                    HideMove();
+                    return;
+                }
+            }
+            isStalemate = 1;
+            Debug.Log("stalemate 1");
+            isStalemateCheck = false;
+            //ResetStalemate();
+        }
+        public void ResetStalemate() {
+            isStalemateCheck = false;
+            countPossibleMoves = 0;
         }
         public void CheckKing() {
             if (pieceAttackKing == byte.MaxValue) return;
@@ -210,7 +255,11 @@ namespace Andrey04o.Chess {
         
             foreach (Piece king in pieces.allKings) {
                 if(king.GetCurrentCell().IsAttacking(king)) {
+                    if(isStalemate == 1) {
+                        isStalemate = 2;
+                    }
                     king.GetCurrentCell().VectorGetPieces(king, true);
+                    
                     break;
                 }
             }
@@ -225,12 +274,21 @@ namespace Andrey04o.Chess {
             cellsNeedDefend[cellsNeedDefendCount] = cell;
             cellsNeedDefendCount++;
         }
+        public void AddCellCheck2(Cell cell) {
+            cellsNeedDefend2[cellsNeedDefendCount2] = cell;
+            cell.meshRenderer.material = cell.materialOrange;
+            cellsNeedDefendCount2++;
+            //Debug.Log("ADD " + cell.name + " count " + cellsNeedDefendCount2);
+        }
         public void SetCellsToCheck() {
             for (int i = 0; i < cellsNeedDefendCount; i++) {
                 cellsNeedDefend[i].isCheck = true;
             }
-            if (cellsNeedDefendCount == 0) {
-
+        }
+        public void SetCellsToCheck2() {
+            for (int i = 0; i < cellsNeedDefendCount2; i++) {
+                Debug.Log("cell2 " + cellsNeedDefend2[i].name);
+                cellsNeedDefend2[i].isCheck2 = true;
             }
         }
         public void ResetCellsCheck() {
@@ -239,6 +297,13 @@ namespace Andrey04o.Chess {
             }
             cellsNeedDefendCount = 0;
             isKingCheck = 0;
+        }
+        public void ResetCellsCheck2() {
+            Debug.Log(cellsNeedDefendCount2);
+            for (int i = 0; i < cellsNeedDefendCount2; i++) {
+                cellsNeedDefend2[i].isCheck2 = false;
+            }
+            cellsNeedDefendCount2 = 0;
         }
         public void PerformCheckIsKing(Cell cell, Piece piece) {
             if (cell.pieceCurrent == null) return;
@@ -252,12 +317,25 @@ namespace Andrey04o.Chess {
         }
         public bool IsKingCheck(bool ignore = false) {
             if (ignore) return false;
+            //if (cellsNeedDefendCount2 > 0) return false;
             if (isKingCheck == 0) return false;
             if (isKingCheck == 1) return true;
             return false;
         }
+        public bool IsUnderAttack() {
+            if (cellsNeedDefendCount2 > 0) return true;
+            return false;
+        }
         public void AddAttackPieceKing(Piece piece) {
             pieceAttackKing = piece.id;
+        }
+        public void PerformGameOver() {
+            if (isStalemate == 0) return;
+            if (isStalemate == 1) {
+                Debug.Log("STALEMATE");
+            } else {
+                Debug.Log("CHECKMATE");
+            }
         }
     }
 }

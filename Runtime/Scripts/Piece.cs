@@ -48,8 +48,7 @@ namespace Andrey04o.Chess {
             if (gameField.IsHisTurn(this) == false) return;
             handler.currentPiece = this;
             pieceGrab.StartGrab(handler.cursorController);
-            //gameField.RemoveAttack();
-            //gameField.CalcAttacks();
+            gameField.ResetCellsCheck2();
             GetPiece().ShowMove(this);
         }
         public void StopGrab(Cell cell) {
@@ -61,6 +60,7 @@ namespace Andrey04o.Chess {
             }
             pieceGrab.StopGrab();
             gameField.HideMove();
+            gameField.ResetCellsCheck2();
             if (cell != GetCurrentCell()) {
                 isMoved = true;
                 GetPiece().PerformMove(cell,this);
