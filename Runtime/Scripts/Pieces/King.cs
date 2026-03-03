@@ -8,37 +8,48 @@ namespace Andrey04o.Chess {
         public override void CalcAttack(Piece piece, bool isRemove = false, bool isVisualMoving = false)
         {
             base.CalcAttack(piece);
-            piece.AddCellAttack(new Vector2Int(1,1), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(-1,1), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(1,-1), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(-1,-1), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(1,0), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(-1,0), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(0,1), isRemove, isVisualMoving);
-            piece.AddCellAttack(new Vector2Int(0,-1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(1,1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(-1,1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(1,-1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(-1,-1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(1,0), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(-1,0), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(0,1), isRemove, isVisualMoving);
+            KingMove(piece, new Vector2Int(0,-1), isRemove, isVisualMoving);
+        }
+        void KingMove(Piece piece, Vector2Int dir, bool isRemove, bool isVisualMoving) {
+            if (isVisualMoving == false) {
+                piece.AddCellAttack(dir, isRemove, isVisualMoving);
+                return;
+            }
+            Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
+            if (cell != null) {
+                if (cell.IsAttacking(piece) == false) {
+                    piece.AddCellAttack(dir, isRemove, isVisualMoving);
+                }
+            }
         }
         public override void ShowMove(Piece piece)
         {
-            Cell cell;
-            for (int i = 0; i < piece.dir1Count; i++) {
-                cell = piece.gameField.cells[piece.dir1[i]];
-                if (piece.isBlack) {
-                    if (cell.attackByCount == 0) {
-                        piece.gameField.AddMove(cell, piece);
-                    }
-                } else {
-                    if (cell.attackByCountBlack == 0) {
-                        piece.gameField.AddMove(cell, piece);
-                    }
-                }
-            }
-
+            base.ShowMove(piece);
             // castling
             if (piece.isNotMoved != 0) return;
             if (piece.GetCurrentCell().IsAttacking(piece)) return;
             //piece.gameField.
             CheckCastlingQueenside(piece);
             CheckCastlingKingside(piece);
+        }
+        public Cell CheckMove(Piece piece, Vector2Int dir) {
+            Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
+            if (cell != null) {
+                if (cell.IsAttacking(piece) == false) {
+                    if (cell.pieceCurrent == null) {
+                        piece.gameField.AddMove(cell, piece);
+                        return cell;
+                    }
+                }
+            }
+            return null;
         }
         bool GetLeftEmpty(ref Cell cell) {
             cell = cell.GetLeft();
@@ -83,8 +94,8 @@ namespace Andrey04o.Chess {
         public override void PerformMove(Cell cell, Piece piece)
         {
             if (piece.isNotMoved == 0) {
-                if (cell.castling == 0) return;
-                castling = true;
+                if (cell.castling != 0)
+                    castling = true;
             }
             if (GetCastle(cell, out Piece castle, out Cell cellCastle)) {
                 piece.gameField.AddChangePosition(castle, cellCastle);

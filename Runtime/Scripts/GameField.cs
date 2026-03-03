@@ -137,7 +137,6 @@ namespace Andrey04o.Chess {
         public void AddChangedCell(Piece piece, Cell cell) {
             cell.VectorGetPieces(piece);
             AddCellChangedArray(cell);
-            cell.materialNormal = cell.materialOrange;
             cell.SetMaterial(0);
         }
         public void AddChangedCell(Cell cell) {
@@ -154,8 +153,7 @@ namespace Andrey04o.Chess {
                 if (piece != null) {
                     if (piece.isCalculatedAttacks == isCalculatedAttacks) {
                         piece.isCalculatedAttacks++;
-                        cellChanged[i].materialNormal = materialgreen;
-                        cellChanged[i].SetMaterial(0);
+                        cellChanged[i].meshRenderer.material = materialgreen;
                         piece.GetPiece().CalcAttack(piece, isRemove, false);
                     }
                 }
