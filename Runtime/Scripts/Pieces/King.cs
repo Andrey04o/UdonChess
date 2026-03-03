@@ -87,7 +87,6 @@ namespace Andrey04o.Chess {
                 castling = true;
             }
             if (GetCastle(cell, out Piece castle, out Cell cellCastle)) {
-                piece.gameField.AddChangedCell(castle, cellCastle);
                 piece.gameField.AddChangePosition(castle, cellCastle);
             }
             base.PerformMove(cell, piece);

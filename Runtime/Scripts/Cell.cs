@@ -306,13 +306,14 @@ namespace Andrey04o.Chess {
                 neighbourCell.meshRenderer.material = materialOrange;
             }
         }
+        /*
         public void VectorCalcAttack(bool isRemove = false) {
             for (int i = 0; i < piecesVectorCount; i++) {
                 if (piecesVector[i].isCaptured == 1) continue;
                 piecesVector[i].GetPiece().CalcAttack(piecesVector[i], isRemove);
             }
         }
-
+        */
 
         int GetBitPositionFromDirection(Vector2Int dir) {
             // Кодируем направление в индекс через смещение

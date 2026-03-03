@@ -38,7 +38,6 @@ namespace Andrey04o.Chess {
         public override void ShowMove(Piece piece)
         {
             base.ShowMove(piece);
-            Cell cell;
             if (piece.isBlack) {
                 if (PawnMove(piece, new Vector2Int(0,1)) != null)
                 if (piece.isNotMoved == 0) {
@@ -65,7 +64,6 @@ namespace Andrey04o.Chess {
         public override void PerformMove(Cell cell, Piece piece)
         {
             if (cell.pieceEnPassant != null) {
-                piece.gameField.AddChangedCell(cell.pieceEnPassant, cell.pieceEnPassant.GetCurrentCell());
                 piece.gameField.AddRemovePiece(cell.pieceEnPassant);
             }
             base.PerformMove(cell, piece);

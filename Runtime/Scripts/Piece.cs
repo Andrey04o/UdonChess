@@ -27,6 +27,7 @@ namespace Andrey04o.Chess {
         public byte isNotMoved = 0;
         public byte isCaptured = 0;
         bool isMoved = false;
+        public byte isCalculatedAttacks = 0;
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }
@@ -61,9 +62,6 @@ namespace Andrey04o.Chess {
             gameField.HideMove();
             if (cell != GetCurrentCell()) {
                 isMoved = true;
-                gameField.ResetChangedCell();
-                gameField.AddChangedCell(this, GetCurrentCell());
-                gameField.AddChangedCell(this, cell);
                 GetPiece().PerformMove(cell,this);
                 GetPiece().AfterMove(cell,this);
             } else {
@@ -71,18 +69,12 @@ namespace Andrey04o.Chess {
             }
         }
         virtual public void PerformMove(Cell cell, Piece piece) {
-            piece.gameField.UpdateChangedCells(true);
-
             if (cell.pieceCurrent != null) {
                 piece.gameField.AddRemovePiece(cell.pieceCurrent);
             }
             piece.gameField.AddChangePosition(piece, cell);
-            
-            piece.gameField.UpdateRemovePiece();
-            piece.gameField.UpdateChangePosition();
-            piece.gameField.ChangeSide();
 
-            piece.gameField.UpdateChangedCells(false);
+            piece.gameField.MakeMove();
         }
         virtual public void AfterMove(Cell cell, Piece piece) {
             if (piece.isMoved == true) {

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
+using UnityEditor.Experimental.GraphView;
 namespace Andrey04o.Chess {
     public class GameField : UdonSharpBehaviour
     {
@@ -126,7 +127,8 @@ namespace Andrey04o.Chess {
         }
         public void ResetChangedCell() {
             for (int i = 0; i < cellChangedCount; i++) {
-                cellChanged[i].isCalculatedAttacks = 0;
+                Piece piece =cellChanged[i].pieceCurrent;
+                if (piece != null) piece.isCalculatedAttacks = 0;
             }
             cellChangedCount = 0;
             piecesToRemoveCount = 0;
@@ -135,10 +137,13 @@ namespace Andrey04o.Chess {
         public void AddChangedCell(Piece piece, Cell cell) {
             cell.VectorGetPieces(piece);
             AddCellChangedArray(cell);
+            cell.materialNormal = cell.materialOrange;
+            cell.SetMaterial(0);
         }
         public void AddChangedCell(Cell cell) {
             AddCellChangedArray(cell);
         }
+        public Material materialgreen;
         public void UpdateChangedCells(bool isRemove = false) {
             Piece piece;
             byte isCalculatedAttacks;
@@ -147,32 +152,55 @@ namespace Andrey04o.Chess {
             for (int i = 0; i < cellChangedCount; i++) {
                 piece = cellChanged[i].pieceCurrent;
                 if (piece != null) {
-                    if (cellChanged[i].isCalculatedAttacks == isCalculatedAttacks) {
+                    if (piece.isCalculatedAttacks == isCalculatedAttacks) {
+                        piece.isCalculatedAttacks++;
+                        cellChanged[i].materialNormal = materialgreen;
+                        cellChanged[i].SetMaterial(0);
                         piece.GetPiece().CalcAttack(piece, isRemove, false);
-                        cellChanged[i].isCalculatedAttacks++;
                     }
                 }
+                //cellChanged[i].isCalculatedAttacks++;
             }
         }
         public void AddRemovePiece(Piece piece) {
+            AddChangedCell(piece, piece.GetCurrentCell());
             piecesToRemove[piecesToRemoveCount] = piece;
             piecesToRemoveCount++;
         }
         public void AddChangePosition(Piece piece, Cell destination) {
             //piecesMove[piecesMoveCount] = new PiecesMove();
+            AddChangedCell(piece, piece.GetCurrentCell());
+            AddChangedCell(piece, destination);
             piecesMove[piecesMoveCount]= piece;
             piecesMoveDestination[piecesMoveCount] = destination;
             piecesMoveCount++;
         }
         public void UpdateRemovePiece() {
             for (int i = 0; i < piecesToRemoveCount; i++) {
+                piecesToRemove[i].GetCurrentCell().isCalculatedAttacks = 1;
+                piecesToRemove[i].isCaptured = 1;
                 piecesToRemove[i].PerformCapture();
             }
         }
         public void UpdateChangePosition() {
             for (int i = 0; i < piecesMoveCount; i++) {
+                Debug.Log("place to " + piecesMoveDestination[i].name);
                 piecesMove[i].PlacePiece(piecesMoveDestination[i]);
             }
+        }
+        public void MakeMove() {
+            Debug.Log("UpdateChangedCells(true)");
+            UpdateChangedCells(true);
+            Debug.Log("UpdateRemovePiece");
+            UpdateRemovePiece();
+            Debug.Log("UpdateChangePosition");
+            UpdateChangePosition();
+            Debug.Log("UpdateChangedCells");
+            UpdateChangedCells(false);
+            Debug.Log("ChangeSide");
+            ChangeSide();
+            Debug.Log("ResetChangedCell");
+            ResetChangedCell();
         }
 
     }
