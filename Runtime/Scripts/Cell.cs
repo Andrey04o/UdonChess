@@ -146,16 +146,16 @@ namespace Andrey04o.Chess {
             }
         }
         */
-        public void SetAttack(Piece piece, bool isAttack, bool isVisualMoving) {
+        public void SetAttack(Piece piece, bool isAttack, bool isVisualMoving, bool ignoreKingCheck) {
             if (isVisualMoving) {
                 if (isAttack)
-                    piece.gameField.AddMove(this, piece);
+                    piece.gameField.AddMove(this, piece, ignoreKingCheck);
                 else
-                    SetMove(false, piece.gameField.IsKingCheck());
+                    SetMove(false, piece.gameField.IsKingCheck(ignoreKingCheck));
                 return;
             }
-            Debug.Log(isAttack + " " + attackByCount + " "+ this.name);
             if (isAttack) {
+                piece.gameField.PerformCheckIsKing(this, piece);
                 if (piece.isBlack) attackByCountBlack++;
                 else attackByCount++;
             } else {
@@ -303,12 +303,17 @@ namespace Andrey04o.Chess {
                 for(;;) {
                     neighbourCell = neighbourCell.GetNeighbourByOffset(negativeMovement);
                     if (neighbourCell == null) return; // impossible
-                    //gameField.AddCellSliding(neighbourCell);
                     if (isKingCheck) gameField.AddCellCheck(neighbourCell);
                     if (neighbourCell.pieceCurrent != null) break;
                 }
-                if (isKingCheck) return;
                 Piece neighbourPiece = neighbourCell.pieceCurrent;
+                if (isKingCheck) {
+                    if (piece.isBlack == neighbourPiece.isBlack) {
+                        gameField.ResetCellsCheck();
+                        continue;
+                    }
+                    return;
+                }
                 if (neighbourPiece == piece) continue;
                 gameField.AddChangedCell(neighbourCell);
                 piecesVector[piecesVectorCount] = neighbourPiece;

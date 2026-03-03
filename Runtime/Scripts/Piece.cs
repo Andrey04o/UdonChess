@@ -102,52 +102,27 @@ namespace Andrey04o.Chess {
         public virtual void CalcAttack(Piece piece, bool isRemove = false, bool isVisualMoving = false) {
 
         }
-        public void AddAttack(Cell cell, bool isRemove = false, bool isVisualMoving = false) {
-            cell.SetAttack(this, !isRemove, isVisualMoving);
-            /*
-            if (isRemove) {
-                dir1Count = 0;
-            } else {
-                dir1[dir1Count] = cell.position;
-                dir1Count++;
-            }
-            */
+        public void AddAttack(Cell cell, bool isRemove = false, bool isVisualMoving = false, bool ignoreKingCheck = false) {
+            cell.SetAttack(this, !isRemove, isVisualMoving, ignoreKingCheck);
         }
-        public void AddAttack(Cell cell, Vector2Int dir, bool isRemove = false, bool isVisualMoving = false) {
-            cell.SetAttack(this, !isRemove, isVisualMoving);
+        public void AddAttack(Cell cell, Vector2Int dir, bool isRemove = false, bool isVisualMoving = false, bool ignoreKingCheck = false) {
+            cell.SetAttack(this, !isRemove, isVisualMoving, ignoreKingCheck);
             if (isVisualMoving == false) cell.SetAttackVector(dir, !isRemove);
-            /*
-            if (isRemove) {
-                dir1Count = 0;
-            
-            } else {
-                dir1[dir1Count] = cell.position;
-                dir1Count++;
-            }
-            */
-            
         }
         virtual public void RemoveAttack(Piece piece) {
             piece.GetPiece().CalcAttack(piece, false);
-            /*
-            for(int i = 0; i < piece.dir1Count; i++) {
-                piece.gameField.cells[piece.dir1[i]].SetAttack(piece, false);
-            }
-            
-            piece.dir1Count = 0;
-            */
         }
-        public void AddCellAttack(Vector2Int dir, bool isRemove = false, bool isVisualMoving = false) {
+        public void AddCellAttack(Vector2Int dir, bool isRemove = false, bool isVisualMoving = false, bool ignoreKingCheck = false) {
             Cell cell = GetCurrentCell().GetNeighbourByOffset(dir);
             if (cell != null) {
-                AddAttack(cell, isRemove, isVisualMoving);
+                AddAttack(cell, isRemove, isVisualMoving, ignoreKingCheck);
             }
         }
-        public void AddSlidingCellAttack(Vector2Int dir, bool isRemove = false, bool isVisualMoving = false) {
+        public void AddSlidingCellAttack(Vector2Int dir, bool isRemove = false, bool isVisualMoving = false, bool ignoreKingCheck = false) {
             Cell[] cells = GetCurrentCell().GetSlidingCells(dir);
             foreach (Cell cell in cells) {
                 //dir2[dir1Count] = dir;
-                AddAttack(cell, dir, isRemove, isVisualMoving);
+                AddAttack(cell, dir, isRemove, isVisualMoving, ignoreKingCheck);
                 //cell.SetAttackVector(dir, true);
             }
         }

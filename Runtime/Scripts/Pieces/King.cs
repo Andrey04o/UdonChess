@@ -19,13 +19,13 @@ namespace Andrey04o.Chess {
         }
         void KingMove(Piece piece, Vector2Int dir, bool isRemove, bool isVisualMoving) {
             if (isVisualMoving == false) {
-                piece.AddCellAttack(dir, isRemove, isVisualMoving);
+                piece.AddCellAttack(dir, isRemove, isVisualMoving, true);
                 return;
             }
             Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
             if (cell != null) {
                 if (cell.IsAttacking(piece) == false) {
-                    piece.AddCellAttack(dir, isRemove, isVisualMoving);
+                    piece.AddCellAttack(dir, isRemove, isVisualMoving, true);
                     piece.countPossibleMoves++;
                 }
             }

@@ -26,6 +26,7 @@ namespace Andrey04o.Chess {
         public byte isKingCheck = 0;
         public Cell[] cellsNeedDefend = new Cell[27];
         public byte cellsNeedDefendCount = 0;
+        public byte pieceAttackKing;
         
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -61,18 +62,20 @@ namespace Andrey04o.Chess {
                 cell.RemoveAttack();
             }
         }
-        public void AddMove(Cell cell) {
-            if (cell.SetMove(true, IsKingCheck() == true)) {
+        public void AddMove(Cell cell, bool ignoreKingCheck = false) {
+            if (cell.SetMove(true, IsKingCheck(ignoreKingCheck) == true)) {
                 dirMove[dirMoveCount] = cell.position;
                 dirMoveCount++;
             }
         }
-        public void AddMove(Cell cell, Piece piece) {
-            if (cell.SetMove(piece, IsKingCheck()) == true) {
+        public void AddMove(Cell cell, Piece piece, bool ignoreKingCheck = false) {
+            if (cell.SetMove(piece, IsKingCheck(ignoreKingCheck)) == true) {
                 dirMove[dirMoveCount] = cell.position;
                 dirMoveCount++;
+                //PerformCheckIsKing(cell)
             }
         }
+        
         public void AddMove(Cell[] cells, Piece piece) {
             foreach (Cell cell in cells) {
                 AddMove(cell, piece);
@@ -191,6 +194,7 @@ namespace Andrey04o.Chess {
             }
         }
         public void MakeMove() {
+            pieceAttackKing = byte.MaxValue;
             UpdateChangedCells(true);
             UpdateRemovePiece();
             UpdateChangePosition();
@@ -201,15 +205,21 @@ namespace Andrey04o.Chess {
             CheckKing();
         }
         public void CheckKing() {
-            foreach (Piece piece in pieces.allKings) {
-                if(piece.GetCurrentCell().IsAttacking(piece)) {
-                    piece.GetCurrentCell().VectorGetPieces(piece, true);
-                    isKingCheck = 1;
-                    SetCellsToCheck();
-                    Debug.Log("CHECK");
-                    return;
+            if (pieceAttackKing == byte.MaxValue) return;
+            Piece piece = pieces.InTableAll[pieceAttackKing];
+        
+            foreach (Piece king in pieces.allKings) {
+                if(king.GetCurrentCell().IsAttacking(king)) {
+                    king.GetCurrentCell().VectorGetPieces(king, true);
+                    break;
                 }
             }
+            AddCellCheck(piece.GetCurrentCell());
+            isKingCheck = 1;
+            
+            SetCellsToCheck();
+            Debug.Log("CHECK");
+            
         }
         public void AddCellCheck(Cell cell) {
             cellsNeedDefend[cellsNeedDefendCount] = cell;
@@ -219,6 +229,9 @@ namespace Andrey04o.Chess {
             for (int i = 0; i < cellsNeedDefendCount; i++) {
                 cellsNeedDefend[i].isCheck = true;
             }
+            if (cellsNeedDefendCount == 0) {
+
+            }
         }
         public void ResetCellsCheck() {
             for (int i = 0; i < cellsNeedDefendCount; i++) {
@@ -227,10 +240,24 @@ namespace Andrey04o.Chess {
             cellsNeedDefendCount = 0;
             isKingCheck = 0;
         }
-        public bool IsKingCheck() {
+        public void PerformCheckIsKing(Cell cell, Piece piece) {
+            if (cell.pieceCurrent == null) return;
+            if (cell.pieceCurrent.GetPiece() == pieces.king) {
+                if (cell.pieceCurrent.isBlack != piece.isBlack) {
+                    AddAttackPieceKing(piece);
+                    Debug.Log(piece.GetCurrentCell().name + "is attacking");
+                }
+                    
+            }
+        }
+        public bool IsKingCheck(bool ignore = false) {
+            if (ignore) return false;
             if (isKingCheck == 0) return false;
             if (isKingCheck == 1) return true;
             return false;
+        }
+        public void AddAttackPieceKing(Piece piece) {
+            pieceAttackKing = piece.id;
         }
     }
 }
