@@ -12,7 +12,7 @@ using UdonSharp;
 /// - Cursor position is clamped so it won't move outside the canvas/screen
 /// </summary>
 namespace Andrey04o.RaycastButton {
-    [DisallowMultipleComponent]
+    [DisallowMultipleComponent] [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class CursorController : UdonSharpBehaviour
     {
         [Header("References")]

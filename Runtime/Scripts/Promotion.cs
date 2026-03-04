@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
+using VRC.SDK3.Dynamics.Constraint.Components;
 namespace Andrey04o.Chess {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class Promotion : UdonSharpBehaviour
     {
         public Piece piece;
         public Quaternion rotation;
+        public VRCRotationConstraint rotationConstraint;
         public void SetPromotion(byte id) {
             piece.ConfirmPromotion(id);
         }
@@ -14,11 +17,13 @@ namespace Andrey04o.Chess {
             piece.CancelPromotion();
         }
         public void ChangeRotation(Quaternion rotation) {
-            this.rotation = transform.rotation;
-            transform.rotation = rotation;
+            rotationConstraint.ActivateConstraint();
         }
         public void ResetRotation() {
-            transform.rotation = rotation;
+            //rotationConstraint.ZeroConstraint();
+            rotationConstraint.IsActive = false;
+            transform.localRotation = rotation;
         }
+        
     }
 }

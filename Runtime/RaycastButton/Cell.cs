@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
 namespace Andrey04o.RaycastButton {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class Cell : RaycastButton
     {
         public Chess.Cell cell;
@@ -12,6 +13,7 @@ namespace Andrey04o.RaycastButton {
         {
             base.OnRaycastEnter();
             meshRenderer.material.Lerp(cell.materialCurrent, materialHighlight, 0.5f);
+            
 
         }
         public override void OnRaycastExit()

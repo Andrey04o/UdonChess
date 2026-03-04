@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using VRC;
+using Andrey04o.RaycastButton;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -19,6 +21,9 @@ namespace Andrey04o.Chess {
         [SerializeField] private float padding = 0.1f;
         List<Piece> piecesList = new List<Piece>();
         List<Piece> kingsList = new List<Piece>();
+        public InteractiveButtonChangeCamera interactiveButtonChangeCamera;
+        public Material materialBlack;
+        public Material materialWhite;
         
         private Transform gridContainer;
         #if UNITY_EDITOR
@@ -40,6 +45,7 @@ namespace Andrey04o.Chess {
             pieces.transform.SetParent(gameField.transform);
             pieces.gameObject.SetActive(false);
             gameField.pieces = pieces;
+            interactiveButtonChangeCamera.gameField = gameField;
             Vector3 cellPosition = new Vector3(0, 0, 0);
             List<Cell> cells = new List<Cell>();
             List<Cell> cells2 = new List<Cell>();
@@ -64,6 +70,17 @@ namespace Andrey04o.Chess {
                     
                     if (cell != null)
                     {
+                        if ((cells2.Count + lines.Count) % 2 == 0) {
+                            cell.meshRenderer.sharedMaterial = materialBlack;
+                            cell.materialNormal = materialBlack;
+                            cell.materialCurrent = materialBlack;
+                            cell.materialAttackColored = materialBlack;
+                        } else {
+                            cell.meshRenderer.sharedMaterial = materialWhite;
+                            cell.materialNormal = materialWhite;
+                            cell.materialCurrent = materialWhite;
+                            cell.materialAttackColored = materialWhite;
+                        }
                         cell.transform.localPosition = cellPosition;
                         cell.name = $"Cell_{x}_{y}";
                         cell.line = line;
@@ -102,6 +119,7 @@ namespace Andrey04o.Chess {
                 
             }
             cells2.Clear();
+            EditorUtility.SetDirty(interactiveButtonChangeCamera);
         }
         byte idChess = 0;
         private void PlaceChessPieces(GameField gameField)
@@ -158,10 +176,15 @@ namespace Andrey04o.Chess {
                 if (isBlack) {
                     piece.forward = new Vector2Int(0,1);
                     piece.left = new Vector2Int(1,0);
+                    piece.promotion.rotation.eulerAngles = new Vector3(0, 180, 0); 
                 } else {
                     piece.forward = new Vector2Int(0,-1);
                     piece.left = new Vector2Int(-1,0);
+                    piece.promotion.rotation.eulerAngles = new Vector3(0, 0, 0); 
                 }
+                piece.promotion.transform.localRotation = piece.promotion.rotation;
+                piece.rotationConstraint.Sources.Add(new VRC.Dynamics.VRCConstraintSource(interactiveButtonChangeCamera.desktopControl.transform, 1f));
+                piece.promotion.rotationConstraint.Sources.Add(new VRC.Dynamics.VRCConstraintSource(interactiveButtonChangeCamera.desktopControl.transform, 1f));
                 piece.transform.position = cell.positionPiece.transform.position;
                 cell.pieceCurrent = piece;
                 // Apply material to the visible model
@@ -179,6 +202,7 @@ namespace Andrey04o.Chess {
                 }
                 EditorUtility.SetDirty(cell);
                 EditorUtility.SetDirty(piece);
+                EditorUtility.SetDirty(piece.promotion);
             }
         }
         #endif

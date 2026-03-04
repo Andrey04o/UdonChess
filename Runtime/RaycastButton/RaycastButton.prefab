@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8425849623091311537}
   - component: {fileID: -4175332709250937386}
   - component: {fileID: 5876565379173906168}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: RaycastButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}

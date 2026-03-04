@@ -5,6 +5,7 @@ using UdonSharp;
 using System;
 using TMPro;
 namespace Andrey04o.Chess {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class Cell : UdonSharpBehaviour
     {
         public byte position;
@@ -12,15 +13,15 @@ namespace Andrey04o.Chess {
         public GameObject positionPiece;
         public Piece pieceCurrent;
         public Piece pieceEnPassant;
-        public Cell cellLeft;
         public GameField gameField;
         public byte index;
         //public byte[] attackBy;
-        public byte attackByCount;
-        public byte attackByCountBlack;
-        public byte attackVector;
+        [UdonSynced] public byte attackByCount;
+        [UdonSynced] public byte attackByCountBlack;
+        [UdonSynced] public byte attackVector;
         public Material materialNormal;
         public Material materialAttack;
+        public Material materialAttackColored;
         public Material materialCurrent;
         public Material materialOrange;
         public MeshRenderer meshRenderer;
@@ -41,6 +42,9 @@ namespace Andrey04o.Chess {
             pieceCurrent = piece;
             piece.transform.parent = transform;
             piece.transform.position = positionPiece.transform.position;
+            Quaternion rotation = piece.objectSync.transform.localRotation;
+            rotation.eulerAngles = new Vector3(-90, rotation.eulerAngles.y, rotation.eulerAngles.z);
+            piece.objectSync.transform.localRotation = rotation;
             piece.objectSync.transform.localPosition = piece.offset;
             piece.objectSync.TeleportTo(piece.objectSync.transform);
         }
@@ -220,6 +224,7 @@ namespace Andrey04o.Chess {
             if (index == 0) {
                 materialCurrent = materialNormal;
             } else {
+                //materialAttackColored.Lerp(materialNormal, materialAttack, 0.5f);
                 materialCurrent = materialAttack;
             }
             meshRenderer.material = materialCurrent;
@@ -469,6 +474,23 @@ namespace Andrey04o.Chess {
             }
         }
 
+        public override void OnDeserialization()
+        {
+            base.OnDeserialization();
+            text1.text = attackByCount + "";
+            text2.text = attackByCountBlack + "";
+            text3.text = "";
+            for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
+                // Check if this direction has an attack vector
+                if ((attackVector & (1 << bitPosition)) == 0) continue;
+                text3.text += GetTextFromDirection(bitPosition) + "/";
+                
+            }
+        }
+        public void UpdateInfo() {
+            RequestSerialization();
+        }
+        
 
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UdonSharp;
 namespace Andrey04o.RaycastButton {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class ChangeValueSlider : UdonSharpBehaviour
     {
         public Slider slider;

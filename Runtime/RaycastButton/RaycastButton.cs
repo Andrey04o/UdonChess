@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
 namespace Andrey04o.RaycastButton {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class RaycastButton : UdonSharpBehaviour
     {
         virtual public void OnRaycastEnter() {

@@ -6,13 +6,19 @@ using VRC.SDK3.Components;
 using Andrey04o.RaycastButton;
 using System;
 using System.Linq;
+using VRC.SDK3.Dynamics.Constraint.Components;
+using VRC.SDKBase;
+using VRC.Udon.Common.Interfaces;
+using VRC.SDK3.UdonNetworkCalling;
 namespace Andrey04o.Chess {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class Piece : UdonSharpBehaviour
     {
         public byte id;
         public MeshRenderer meshRenderer;
         public MeshFilter meshFilter;
-        public byte indexType;
+        public MeshCollider meshCollider;
+        [UdonSynced] public byte indexType;
         public Vector3 offset;
         public Vector2Int forward;
         public Vector2Int left;
@@ -22,12 +28,9 @@ namespace Andrey04o.Chess {
         public VRCObjectSync objectSync;
         [UdonSynced] public byte position;
         public byte positionPrevious;
-        public byte[] dir1 = new byte[27];
-        //public Vector2Int[] dir2 = new Vector2Int[27];
-        public byte dir1Count = 0;
         public bool isBlack = false;
-        public byte isNotMoved = 0;
-        public byte isCaptured = 0;
+        [UdonSynced] public byte isNotMoved = 0;
+        [UdonSynced] public byte isCaptured = 0;
         bool isMoved = false;
         public byte isCalculatedAttacks = 0;
         public byte countPossibleMoves = 0;
@@ -36,6 +39,8 @@ namespace Andrey04o.Chess {
         public SpriteRenderer spriteRenderer;
         public Sprite spriteWhite;
         public Sprite spriteBlack;
+        public VRCRotationConstraint rotationConstraint;
+        public bool is2DMode = false;
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }
@@ -46,6 +51,7 @@ namespace Andrey04o.Chess {
             Piece piece = gameField.pieces.GetPiece(indexType);
             if (piece != null) {
                 meshFilter.sharedMesh = piece.meshFilter.sharedMesh;
+                meshCollider.sharedMesh = piece.meshFilter.sharedMesh;
                 offset = piece.offset;
                 meshRenderer.gameObject.transform.localPosition = offset;
                 this.indexType = indexType;
@@ -54,10 +60,12 @@ namespace Andrey04o.Chess {
             }
         }
         public void StartGrab(TileRaycastHandler handler) {
+            //if (Networking.IsOwner(Networking.LocalPlayer, gameObject) == false)
+            //    Networking.SetOwner(Networking.LocalPlayer, this.gameObject);
             if (gameField.IsHisTurn(this) == false) return;
-            handler.currentPiece = this;
+            if (handler != null) handler.currentPiece = this;
             gameField.CancelPromotion();
-            pieceGrab.StartGrab(handler.cursorController);
+            if (handler != null) pieceGrab.StartGrab(handler.cursorController);
             gameField.CheckKingSafe(this);
             gameField.SetCellsToCheck2();
             GetPiece().ShowMove(this);
@@ -74,8 +82,14 @@ namespace Andrey04o.Chess {
             gameField.ResetCellsCheck2();
             if (cell != GetCurrentCell()) {
                 isMoved = true;
-                GetPiece().PerformMove(cell,this);
-                GetPiece().AfterMove(cell,this);
+                if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject)) {
+                    GetPiece().PerformMove(cell,this);
+                    GetPiece().AfterMove(cell,this);
+                } else {
+                    SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(PerformMoveNetwork), cell.position, this.id);
+                    //cell.PlacePieceLocal(this);
+                    //RequestSerialization();
+                }
             } else {
                 cell.PlacePiece(this);
             }
@@ -112,6 +126,11 @@ namespace Andrey04o.Chess {
 
             piece.gameField.MakeMove();
         }
+        [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
+            Cell cell = gameField.cells[cellId];
+            Piece piece = gameField.pieces.InTableAll[pieceId];
+            piece.GetPiece().PerformMove(cell, piece);
+        }
         virtual public void AfterMove(Cell cell, Piece piece) {
             if (piece.isMoved == true) {
                 piece.isMoved = false;
@@ -124,15 +143,24 @@ namespace Andrey04o.Chess {
             isNotMoved = 1;
             //isMoved = true;
             cell.PlacePiece(this);
+            
         }
 
         public void PerformCapture() {
             if (isCaptured == 1) {
                 //GetPiece().CalcAttack(this, true);
                 meshRenderer.enabled = false;
+                meshCollider.enabled = false;
                 spriteRenderer.gameObject.SetActive(false);
                 GetCurrentCell().pieceCurrent = null;
                 //RemoveAttack();
+            } else {
+                if (is2DMode) {
+                    spriteRenderer.gameObject.SetActive(true);
+                } else {
+                    meshRenderer.enabled = true;
+                }
+                meshCollider.enabled = true;
             }
         }
         public virtual void CalcAttack(Piece piece, bool isRemove = false, bool isVisualMoving = false) {
@@ -172,20 +200,39 @@ namespace Andrey04o.Chess {
             return gameField.pieces.GetPiece(indexType);
         }
         public void Set2DMode(bool value, Quaternion rotation) {
+            is2DMode = value;
             if (isCaptured == 0) {
                 spriteRenderer.gameObject.SetActive(value);
-                spriteRenderer.transform.rotation = rotation;
-                if (value == true) promotion.ChangeRotation(rotation);
-                else promotion.ResetRotation();
+                //spriteRenderer.transform.rotation = rotation;
+                if (value == true) {
+                    rotationConstraint.ActivateConstraint();
+                    promotion.ChangeRotation(rotation);
+                }
+                else {
+                    rotationConstraint.ZeroConstraint();
+                    promotion.ResetRotation();
+                }
                 meshRenderer.enabled = !value;
             }
         }
         public void Set2DMode(bool value) {
+            is2DMode = value;
             if (isCaptured == 0) {
                 spriteRenderer.gameObject.SetActive(value);
                 promotion.ResetRotation();
                 meshRenderer.enabled = !value;
             }
+        }
+        public override void OnDeserialization()
+        {
+            base.OnDeserialization();
+            PerformCapture();
+            //if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject)) {
+            //    if (positionPrevious != position) {
+            //        GetPiece().PerformMove(gameField.cells[position], this);
+            //    }
+            //}
+            gameField.cells[position].PlacePieceLocal(this);
         }
     }
 }

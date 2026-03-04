@@ -4,6 +4,7 @@ using VRC.Udon.Common;
 using UdonSharp;
 using Andrey04o.Chess;
 namespace Andrey04o.RaycastButton {
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TileRaycastHandler : UdonSharpBehaviour
     {
         public Camera mainCamera;
