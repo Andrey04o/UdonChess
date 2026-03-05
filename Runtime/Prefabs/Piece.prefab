@@ -308,8 +308,6 @@ MonoBehaviour:
   objectSync: {fileID: 72846530784976453}
   position: 0
   positionPrevious: 0
-  dir1: 000000000000000000000000000000000000000000000000000000
-  dir1Count: 0
   isBlack: 0
   isNotMoved: 0
   isCaptured: 0
@@ -321,6 +319,7 @@ MonoBehaviour:
   spriteWhite: {fileID: 0}
   spriteBlack: {fileID: 0}
   rotationConstraint: {fileID: 8670100968189546769}
+  is2DMode: 0
 --- !u!114 &2975501696403139160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,7 +363,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7981675408270040085
 Transform:
   m_ObjectHideFlags: 0

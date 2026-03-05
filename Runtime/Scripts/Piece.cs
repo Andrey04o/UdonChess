@@ -8,17 +8,17 @@ using System;
 using System.Linq;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using VRC.SDKBase;
-using VRC.Udon.Common.Interfaces;
 using VRC.SDK3.UdonNetworkCalling;
+using VRC.Udon.Common.Interfaces;
 namespace Andrey04o.Chess {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class Piece : UdonSharpBehaviour
     {
         public byte id;
         public MeshRenderer meshRenderer;
         public MeshFilter meshFilter;
         public MeshCollider meshCollider;
-        [UdonSynced] public byte indexType;
+        public byte indexType; //s
         public Vector3 offset;
         public Vector2Int forward;
         public Vector2Int left;
@@ -26,11 +26,11 @@ namespace Andrey04o.Chess {
         public PieceGrab pieceGrab;
         public VRCPickup pickup;
         public VRCObjectSync objectSync;
-        [UdonSynced] public byte position;
+        public byte position; //s
         public byte positionPrevious;
         public bool isBlack = false;
-        [UdonSynced] public byte isNotMoved = 0;
-        [UdonSynced] public byte isCaptured = 0;
+        public byte isNotMoved = 0; //s
+        public byte isCaptured = 0; //s
         bool isMoved = false;
         public byte isCalculatedAttacks = 0;
         public byte countPossibleMoves = 0;
@@ -86,7 +86,7 @@ namespace Andrey04o.Chess {
                     GetPiece().PerformMove(cell,this);
                     GetPiece().AfterMove(cell,this);
                 } else {
-                    SendCustomNetworkEvent(NetworkEventTarget.Owner, nameof(PerformMoveNetwork), cell.position, this.id);
+                    NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)gameField, NetworkEventTarget.Owner, nameof(GameField.PerformMoveNetwork), cell.position, this.id);
                     //cell.PlacePieceLocal(this);
                     //RequestSerialization();
                 }
@@ -126,11 +126,6 @@ namespace Andrey04o.Chess {
 
             piece.gameField.MakeMove();
         }
-        [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
-            Cell cell = gameField.cells[cellId];
-            Piece piece = gameField.pieces.InTableAll[pieceId];
-            piece.GetPiece().PerformMove(cell, piece);
-        }
         virtual public void AfterMove(Cell cell, Piece piece) {
             if (piece.isMoved == true) {
                 piece.isMoved = false;
@@ -146,13 +141,13 @@ namespace Andrey04o.Chess {
             
         }
 
-        public void PerformCapture() {
+        public void PerformCapture(bool isHost = true) {
             if (isCaptured == 1) {
                 //GetPiece().CalcAttack(this, true);
                 meshRenderer.enabled = false;
                 meshCollider.enabled = false;
                 spriteRenderer.gameObject.SetActive(false);
-                GetCurrentCell().pieceCurrent = null;
+                if (isHost) GetCurrentCell().pieceCurrent = null;
                 //RemoveAttack();
             } else {
                 if (is2DMode) {
@@ -213,6 +208,7 @@ namespace Andrey04o.Chess {
                     promotion.ResetRotation();
                 }
                 meshRenderer.enabled = !value;
+                meshCollider.enabled = !value;
             }
         }
         public void Set2DMode(bool value) {
@@ -223,16 +219,6 @@ namespace Andrey04o.Chess {
                 meshRenderer.enabled = !value;
             }
         }
-        public override void OnDeserialization()
-        {
-            base.OnDeserialization();
-            PerformCapture();
-            //if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject)) {
-            //    if (positionPrevious != position) {
-            //        GetPiece().PerformMove(gameField.cells[position], this);
-            //    }
-            //}
-            gameField.cells[position].PlacePieceLocal(this);
-        }
+        
     }
 }

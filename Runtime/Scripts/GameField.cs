@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
 using VRC.Udon.Common;
+using VRC.SDK3.UdonNetworkCalling;
+using Andrey04o.RaycastButton;
 namespace Andrey04o.Chess {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class GameField : UdonSharpBehaviour
@@ -14,6 +16,7 @@ namespace Andrey04o.Chess {
         byte[] dirMove = new byte[27];
         byte dirMoveCount = 0;
         [UdonSynced] byte enPassant = byte.MaxValue;
+        [UdonSynced] public byte[] syncData = new byte[512];
         public Piece enPassantPiece;
         public Cell enPassantCell;
         bool isAttackCalc = false;
@@ -35,6 +38,7 @@ namespace Andrey04o.Chess {
         [UdonSynced] public byte isStalemate = 0;
         [UdonSynced] public byte promotionPiece = byte.MaxValue;
         [UdonSynced] public byte promotionDestination = byte.MaxValue;
+        public TileRaycastHandler tileRaycastHandler;
         
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -111,14 +115,12 @@ namespace Andrey04o.Chess {
         public void SetEnPassant(Piece piece) {
             enPassant = piece.id;
             PerformEnPassant();
-            RequestSerialization();
         }
         public void RemoveEnPassant() {
             if (enPassant == byte.MaxValue) return;
             enPassantCell.pieceEnPassant = null;
             enPassant = byte.MaxValue;
             PerformEnPassant();
-            RequestSerialization();
         }
         public bool ShowEnPassant() {
             if (enPassant == byte.MaxValue) return false;
@@ -142,6 +144,7 @@ namespace Andrey04o.Chess {
         public override void OnDeserialization()
         {
             base.OnDeserialization();
+            UnpackSyncData();
             PerformEnPassant();
             if (isStalemate == 0) return;
             if (isStalemate == 1) {
@@ -157,7 +160,6 @@ namespace Andrey04o.Chess {
         public void ResetChangedCell() {
             for (int i = 0; i < cellChangedCount; i++) {
                 Piece piece = cellChanged[i].pieceCurrent;
-                //cellChanged[i].RequestSerialization();
                 
                 if (piece != null) {
                     piece.isCalculatedAttacks = 0;
@@ -211,14 +213,12 @@ namespace Andrey04o.Chess {
                 piecesToRemove[i].GetCurrentCell().isCalculatedAttacks = 1;
                 piecesToRemove[i].isCaptured = 1;
                 piecesToRemove[i].PerformCapture();
-                piecesToRemove[i].RequestSerialization();
             }
         }
         public void UpdateChangePosition() {
             for (int i = 0; i < piecesMoveCount; i++) {
                 Debug.Log("place to " + piecesMoveDestination[i].name);
                 piecesMove[i].PlacePiece(piecesMoveDestination[i]);
-                piecesMove[i].RequestSerialization();
             }
         }
         public void MakeMove() {
@@ -235,7 +235,58 @@ namespace Andrey04o.Chess {
             CheckKing();
             CheckStalemate();
             PerformGameOver();
+            PackSyncData();
             RequestSerialization();
+        }
+        
+        void PackSyncData() {
+            int offset = 0;
+            
+            // Pack pieces data
+            foreach (Piece piece in pieces.InTableAll) {
+                syncData[offset++] = piece.indexType;
+                syncData[offset++] = piece.position;
+                syncData[offset++] = piece.isNotMoved;
+                syncData[offset++] = piece.isCaptured;
+            }
+            
+            // Pack cells data
+            foreach (Cell cell in cells) {
+                syncData[offset++] = cell.attackByCount;
+                syncData[offset++] = cell.attackByCountBlack;
+                syncData[offset++] = cell.attackVector;
+            }
+        }
+        void UnpackSyncData() {
+            int offset = 0;
+            tileRaycastHandler.currentPiece = null;
+            HideMove();
+            foreach (Cell cell in cells) {
+                cell.pieceCurrent = null;
+                cell.pieceEnPassant = null;
+            }
+            // Unpack pieces data
+            foreach (Piece piece in pieces.InTableAll) {
+                piece.pieceGrab.StopGrab();
+                piece.indexType = syncData[offset++];
+                piece.position = syncData[offset++];
+                piece.isNotMoved = syncData[offset++];
+                piece.isCaptured = syncData[offset++];
+                piece.PerformCapture(false);
+                if (piece.isCaptured == 0) {
+                    cells[piece.position].PlacePieceLocal(piece);
+                    cells[piece.position].pieceCurrent = piece;
+                }
+                    
+            }
+            
+            // Unpack cells data
+            foreach (Cell cell in cells) {
+                cell.attackByCount = syncData[offset++];
+                cell.attackByCountBlack = syncData[offset++];
+                cell.attackVector = syncData[offset++];
+                cell.OnDeserialization();
+            }
         }
         public void CheckStalemate() {
             //isStalemateCheck = true;
@@ -414,6 +465,11 @@ namespace Andrey04o.Chess {
             foreach(Piece piece in pieces.InTableAll) {
                 piece.Set2DMode(value);
             }
+        }
+        [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
+            Cell cell = cells[cellId];
+            Piece piece = pieces.InTableAll[pieceId];
+            piece.GetPiece().PerformMove(cell, piece);
         }
     }
 }

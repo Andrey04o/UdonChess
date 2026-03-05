@@ -5,7 +5,7 @@ using UdonSharp;
 using System;
 using TMPro;
 namespace Andrey04o.Chess {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class Cell : UdonSharpBehaviour
     {
         public byte position;
@@ -16,9 +16,9 @@ namespace Andrey04o.Chess {
         public GameField gameField;
         public byte index;
         //public byte[] attackBy;
-        [UdonSynced] public byte attackByCount;
-        [UdonSynced] public byte attackByCountBlack;
-        [UdonSynced] public byte attackVector;
+        public byte attackByCount; //s
+        public byte attackByCountBlack; //s
+        public byte attackVector; //s
         public Material materialNormal;
         public Material materialAttack;
         public Material materialAttackColored;
@@ -52,6 +52,10 @@ namespace Andrey04o.Chess {
             pieceCurrent = piece;
             piece.transform.parent = transform;
             piece.transform.position = positionPiece.transform.position;
+            piece.objectSync.transform.localPosition = piece.offset;
+            Quaternion rotation = piece.objectSync.transform.localRotation;
+            rotation.eulerAngles = new Vector3(-90, rotation.eulerAngles.y, rotation.eulerAngles.z);
+            piece.objectSync.transform.localRotation = rotation;
             piece.objectSync.transform.localPosition = piece.offset;
         }
 
@@ -480,6 +484,9 @@ namespace Andrey04o.Chess {
             text1.text = attackByCount + "";
             text2.text = attackByCountBlack + "";
             text3.text = "";
+            if (pieceCurrent != null) {
+                text4.text = pieceCurrent.GetPiece().name;
+            } else text4.text = "empty";
             for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
                 // Check if this direction has an attack vector
                 if ((attackVector & (1 << bitPosition)) == 0) continue;

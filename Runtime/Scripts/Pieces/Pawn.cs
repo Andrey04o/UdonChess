@@ -20,8 +20,8 @@ namespace Andrey04o.Chess {
                 piece.gameField.ShowEnPassant();
                 Cell cell = piece.GetCurrentCell().GetNeighbourByOffset(dir);
                 if (cell == null) return;
-                if (cell.pieceEnPassant != null) {
-                    piece.gameField.AddMove(piece.gameField.enPassantCell);
+                if (piece.gameField.enPassantCell != null) {
+                    if (cell.pieceEnPassant != null) piece.gameField.AddMove(piece.gameField.enPassantCell);
                 }
                 if (cell.pieceCurrent != null) {
                     piece.gameField.AddMove(cell, piece);
