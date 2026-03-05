@@ -24,7 +24,17 @@ namespace Andrey04o.Chess {
         public InteractiveButtonChangeCamera interactiveButtonChangeCamera;
         public Material materialBlack;
         public Material materialWhite;
-        
+        public TileTouch tileTouchPrefab;
+        public BoxCollider interfaceCollider;
+        public Transform buttonContainer;
+        public TouchControls touchControls;
+        List<TileTouch> tileTouches = new List<TileTouch>();
+        public TileRaycastHandler tileRaycastHandlerTouch;
+        public TileRaycastHandler tileRaycastHandlerDesktop;
+        public RectTransform cursorTouch;
+        public Camera cameraDesktop;
+        public Canvas canvasDesktop;
+        public RestartButton restartButton;
         private Transform gridContainer;
         #if UNITY_EDITOR
         public void GenerateGrid()
@@ -100,10 +110,22 @@ namespace Andrey04o.Chess {
             }
             gameField.lines = lines.ToArray();
             gameField.cells = cells2.ToArray();
-            EditorUtility.SetDirty(gameField);
+            
+            gameField.tileRaycastHandler = tileRaycastHandlerDesktop;
+            gameField.tileRaycastHandler2 = tileRaycastHandlerTouch;
+            
             lines.Clear();
             
             piecesList.Clear();
+            kingsList.Clear();
+            foreach (TileTouch tileTouch in tileTouches) {
+                if (tileTouch == null) continue;
+                DestroyImmediate(tileTouch.gameObject);
+            }
+            tileTouches.Clear();
+            // Create buttons above cells via raycast
+            CreateButtonsAboveCells(gameField);
+
             // Place chess pieces
             PlaceChessPieces(gameField);
             
@@ -119,8 +141,70 @@ namespace Andrey04o.Chess {
                 
             }
             cells2.Clear();
+            touchControls.tileTouches = tileTouches.ToArray();
+            touchControls.gameField = gameField;
+            EditorUtility.SetDirty(touchControls);
+            cameraDesktop.orthographicSize = transform.lossyScale.x;
+            float scale = 1 / transform.lossyScale.x;
+            cameraDesktop.transform.localScale = new Vector3(scale, scale, scale);
+            gameField.PackSyncData();
+            gameField.syncDataOriginal = gameField.syncData;
+            EditorUtility.SetDirty(gameField);
+            EditorUtility.SetDirty(cameraDesktop);
             EditorUtility.SetDirty(interactiveButtonChangeCamera);
+
+            restartButton.gameField = gameField;
+            EditorUtility.SetDirty(restartButton);
         }
+        
+        private void CreateButtonsAboveCells(GameField gameField)
+        {
+            
+            int buttonCount = 0;
+            Vector3 originalpos = interfaceCollider.transform.position;
+            Vector3 chPos = originalpos;
+            chPos.y += 2 * transform.lossyScale.y;
+            interfaceCollider.transform.position = chPos;
+            // Iterate through all cells
+            foreach (Cell cell in gameField.cells)
+            {
+                // Get cell world position and start raycast from above the cell
+                Vector3 cellWorldPos = cell.transform.position;
+                Vector3 rayStart = cellWorldPos + Vector3.up * 0.7f * transform.lossyScale.y; // Start slightly above cell
+                
+                // Raycast upward from above the cell
+                RaycastHit hit;
+                if (Physics.Raycast(rayStart, Vector3.up, out hit, 100f))
+                {
+                    // Check if we hit the interface collider
+                    if (hit.collider == interfaceCollider)
+                    {
+                        // Instantiate button at hit point
+                        TileTouch tileTouch = PrefabUtility.InstantiatePrefab(tileTouchPrefab, buttonContainer) as TileTouch;
+                        
+                        if (tileTouch != null)
+                        {
+                            tileTouch.transform.position = hit.point;
+                            tileTouch.name = $"Tile_{cell.name}";
+                            tileTouch.raycastHandler = tileRaycastHandlerTouch;
+                            tileTouch.cell = cell.GetComponentInChildren<RaycastButton.Cell>(true);
+                            tileTouch.cursor = cursorTouch;
+                            tileTouch.scrollRect.content = tileTouch.cursor;
+                            Vector3 pos = tileTouch.transform.localPosition;
+                            pos.z = 0;
+                            tileTouch.transform.localPosition = pos;
+                            tileTouches.Add(tileTouch);
+                            EditorUtility.SetDirty(tileTouch);
+                            buttonCount++;
+                        }
+                    }
+                }
+            }
+            interfaceCollider.transform.position = originalpos;
+            
+            Debug.Log($"Created {buttonCount} buttons above cells");
+        }
+        
         byte idChess = 0;
         private void PlaceChessPieces(GameField gameField)
         {
@@ -197,9 +281,12 @@ namespace Andrey04o.Chess {
                 piece.positionPrevious = piece.position;
                 cell.PlacePiece(piece);
                 piece.isNotMoved = 0;
+                piece.originalPosition = piece.position;
+                piece.originalIndexType = piece.indexType;
                 if (pieces.king == piecePrefab) {
                     kingsList.Add(piece);
                 }
+                
                 EditorUtility.SetDirty(cell);
                 EditorUtility.SetDirty(piece);
                 EditorUtility.SetDirty(piece.promotion);

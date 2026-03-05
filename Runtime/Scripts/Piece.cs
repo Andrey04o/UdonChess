@@ -41,6 +41,8 @@ namespace Andrey04o.Chess {
         public Sprite spriteBlack;
         public VRCRotationConstraint rotationConstraint;
         public bool is2DMode = false;
+        public byte originalPosition = 0;
+        public byte originalIndexType = 0;
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }
@@ -65,7 +67,7 @@ namespace Andrey04o.Chess {
             if (gameField.IsHisTurn(this) == false) return;
             if (handler != null) handler.currentPiece = this;
             gameField.CancelPromotion();
-            if (handler != null) pieceGrab.StartGrab(handler.cursorController);
+            if (handler != null) pieceGrab.StartGrab(handler.hitPosition);
             gameField.CheckKingSafe(this);
             gameField.SetCellsToCheck2();
             GetPiece().ShowMove(this);

@@ -485,7 +485,7 @@ namespace Andrey04o.Chess {
             text2.text = attackByCountBlack + "";
             text3.text = "";
             if (pieceCurrent != null) {
-                text4.text = pieceCurrent.GetPiece().name;
+                //text4.text = pieceCurrent.GetPiece().name;
             } else text4.text = "empty";
             for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
                 // Check if this direction has an attack vector

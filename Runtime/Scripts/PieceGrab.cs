@@ -11,17 +11,18 @@ namespace Andrey04o.Chess {
     {
         public Piece piece;
         bool isGrab = false;
-        public CursorController cursor;
+        //public CursorController cursor;
+        public Transform cursor;
         public Transform transform_move;
         public Vector3 offsetGrab;
         void Update() {
             if (isGrab == false) return;
-            transform_move.position = cursor.positionReal;
-            transform_move.position += offsetGrab + piece.offset;
+            transform_move.position = cursor.position;
+            transform_move.position += (offsetGrab + piece.offset) * transform.lossyScale.y;
             piece.objectSync.transform.position = transform_move.position;
             //piece.objectSync.TeleportTo(transform_move);
         }
-        public void StartGrab(CursorController cursor) {
+        public void StartGrab(Transform cursor) {
             gameObject.SetActive(true);
             if (Networking.IsOwner(Networking.LocalPlayer, piece.objectSync.gameObject) == false) {
                 Networking.SetOwner(Networking.LocalPlayer, piece.objectSync.gameObject);

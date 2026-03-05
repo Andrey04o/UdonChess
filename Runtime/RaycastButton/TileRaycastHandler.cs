@@ -3,6 +3,10 @@ using VRC.SDKBase;
 using VRC.Udon.Common;
 using UdonSharp;
 using Andrey04o.Chess;
+using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+using TMPro;
+using UnityEngine.UI;
 namespace Andrey04o.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TileRaycastHandler : UdonSharpBehaviour
@@ -13,6 +17,8 @@ namespace Andrey04o.RaycastButton {
         
         private RaycastButton _currentHoveredTile;
         private RaycastButton _lastHoveredTile;
+        public Transform pointDragTransfrom;
+        public Transform hitPosition;
         [HideInInspector] public Piece currentPiece;
         private bool isHold = false;
         
@@ -35,7 +41,14 @@ namespace Andrey04o.RaycastButton {
             #if UNITY_2022_3_62
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             #else
-            Ray ray = mainCamera.ScreenPointToRay(cursorController.currentPositionScreen);
+            Ray ray;
+            if (mainCamera != null) {
+                ray = mainCamera.ScreenPointToRay(cursorController.currentPositionScreen);
+            } else {
+                ray = new Ray(pointDragTransfrom.position, Vector3.down);
+            }
+             
+
             #endif
             RaycastHit hit;
             if (Input.GetMouseButtonDown(0)) {
@@ -44,7 +57,7 @@ namespace Andrey04o.RaycastButton {
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, tileLayerMask))
             {
-                cursorController.positionReal = hit.point;
+                hitPosition.position = hit.point;
                 RaycastButton tile = hit.collider.GetComponent<RaycastButton>();
                 
                 if (tile != null)
@@ -69,12 +82,11 @@ namespace Andrey04o.RaycastButton {
                     // Handle click
                     if (Input.GetMouseButtonDown(0))
                     {
-                        tile.OnRaycastClick(-cursorController.currentPositionScreen);
+                        tile.OnRaycastClick();
                         tile.OnRaycastDrag(this);
                     }
                     if (Input.GetMouseButtonUp(0)) {
-                        tile.OnRaycastMouseUp(this);
-                        currentPiece = null;
+                        MouseUp();
                     }
                 }
                 else
@@ -90,10 +102,7 @@ namespace Andrey04o.RaycastButton {
             }
             if (Input.GetMouseButtonUp(0)) {
                 isHold = false;
-                if (currentPiece != null) {
-                    currentPiece.StopGrab(null);
-                    currentPiece = null;
-                }
+                MouseUp();
             }
         }
 
@@ -105,6 +114,22 @@ namespace Andrey04o.RaycastButton {
                 _lastHoveredTile = null;
             }
             _currentHoveredTile = null;
+        }
+
+        public void MouseUp() {
+            if (_currentHoveredTile != null) {
+                _currentHoveredTile.OnRaycastMouseUp(this);
+                currentPiece = null;
+            } else if (_lastHoveredTile != null) {
+                _lastHoveredTile.OnRaycastExit();
+                _lastHoveredTile = null;
+            }
+            _currentHoveredTile = null;
+
+            if (currentPiece != null) {
+                currentPiece.StopGrab(null);
+                currentPiece = null;
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace Andrey04o.RaycastButton {
         virtual public void OnRaycastExit() {
 
         }
-        virtual public void OnRaycastClick(Vector2 position) {
+        virtual public void OnRaycastClick() {
 
         }
         virtual public void OnRaycastMouseUp(TileRaycastHandler handler) {

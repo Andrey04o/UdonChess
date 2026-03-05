@@ -76,7 +76,7 @@ namespace Andrey04o.RaycastButton {
             */
         }
 
-        public void Press(Vector2 position) {
+        public void Press() {
             if (isCursorHovering) {
                 // Update pointer event position from cursor controller
                 
@@ -110,8 +110,8 @@ namespace Andrey04o.RaycastButton {
                 selectable.OnPointerExit(pointerEvent);
         }
 
-        public override void OnRaycastClick(Vector2 position) {
-            Press(position);
+        public override void OnRaycastClick() {
+            Press();
         }
 
         private bool CheckIsCursor(Collider other) {

@@ -17,6 +17,7 @@ namespace Andrey04o.Chess {
         byte dirMoveCount = 0;
         [UdonSynced] byte enPassant = byte.MaxValue;
         [UdonSynced] public byte[] syncData = new byte[512];
+        public byte[] syncDataOriginal = new byte[512];
         public Piece enPassantPiece;
         public Cell enPassantCell;
         bool isAttackCalc = false;
@@ -39,6 +40,7 @@ namespace Andrey04o.Chess {
         [UdonSynced] public byte promotionPiece = byte.MaxValue;
         [UdonSynced] public byte promotionDestination = byte.MaxValue;
         public TileRaycastHandler tileRaycastHandler;
+        public TileRaycastHandler tileRaycastHandler2;
         
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -81,7 +83,6 @@ namespace Andrey04o.Chess {
                 Debug.Log("addmove " + cell.name + " " + dirMoveCount);
             }
         }
-        bool isKingBeDanger = false;
         public void CheckKingSafe(Piece piece) {
             piece.GetCurrentCell().VectorCheckKing();
         }
@@ -239,7 +240,7 @@ namespace Andrey04o.Chess {
             RequestSerialization();
         }
         
-        void PackSyncData() {
+        public void PackSyncData() {
             int offset = 0;
             
             // Pack pieces data
@@ -257,9 +258,10 @@ namespace Andrey04o.Chess {
                 syncData[offset++] = cell.attackVector;
             }
         }
-        void UnpackSyncData() {
+        public void UnpackSyncData() {
             int offset = 0;
             tileRaycastHandler.currentPiece = null;
+            tileRaycastHandler2.currentPiece = null;
             HideMove();
             foreach (Cell cell in cells) {
                 cell.pieceCurrent = null;
@@ -470,6 +472,20 @@ namespace Andrey04o.Chess {
             Cell cell = cells[cellId];
             Piece piece = pieces.InTableAll[pieceId];
             piece.GetPiece().PerformMove(cell, piece);
+        }
+        public void RestartBoard() {
+            indexSideTurn = 0;
+            enPassant = byte.MaxValue;
+            isKingCheck = 0;
+            pieceAttackKing = 0;
+            isStalemate = 0;
+            promotionPiece = byte.MaxValue;
+            promotionDestination = byte.MaxValue;
+            for (int i = 0; i < syncData.Length; i++) {
+                syncData[i] = syncDataOriginal[i];
+            }
+            RequestSerialization();
+            UnpackSyncData();
         }
     }
 }
