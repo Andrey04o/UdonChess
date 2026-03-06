@@ -38,14 +38,15 @@ namespace Andrey04o.Chess {
         public byte cellsInAttackCount = 0;
         [UdonSynced] public byte pieceAttackKing = byte.MaxValue;
         [UdonSynced] public byte isStalemate = 0;
-        [UdonSynced] public byte promotionPiece = byte.MaxValue;
-        [UdonSynced] public byte promotionDestination = byte.MaxValue;
+        public byte promotionPiece = byte.MaxValue;
+        public byte promotionDestination = byte.MaxValue;
         public TileRaycastHandler tileRaycastHandler;
         public TileRaycastHandler tileRaycastHandler2;
         public OwnerManager ownerManager;
         public TouchControls touchControls;
         public bool is2DMode;
         public bool isTouchMode;
+        public VisualInterface visualInterface;
         
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -143,8 +144,7 @@ namespace Andrey04o.Chess {
             }
             enPassantPiece = pieces.InTableAll[enPassant];
             enPassantCell = cells[enPassantPiece.position];
-            if (enPassantPiece.isBlack) enPassantCell = enPassantCell.GetNeighbour(Vector2Int.down);
-            else enPassantCell = enPassantCell.GetNeighbour(Vector2Int.up);
+            enPassantCell = enPassantCell.GetNeighbour(enPassantPiece.forward * -1);
         }
         void AddCellChangedArray(Cell cell) {
             cellChanged[cellChangedCount] = cell;
@@ -229,6 +229,7 @@ namespace Andrey04o.Chess {
             CheckKing();
             CheckStalemate();
             PerformGameOver();
+            PerformShowVisual();
             ResetCellsCheck();
             PackSyncData();
             RequestSerialization();
@@ -273,7 +274,7 @@ namespace Andrey04o.Chess {
                     cells[piece.position].PlacePieceLocal(piece);
                     cells[piece.position].pieceCurrent = piece;
                 }
-                    
+                piece.ChangeType(piece.indexType);
             }
             
             // Unpack cells data
@@ -465,13 +466,19 @@ namespace Andrey04o.Chess {
             RequestSerialization();
             UnpackSyncData();
         }
+        public void PerformShowVisual() {
+            visualInterface.ShowWinnerWindow(isStalemate, indexSideTurn == 1);
+            visualInterface.ShowTurn(indexSideTurn == 1);
+        }
         [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
             Cell cell = cells[cellId];
             Piece piece = pieces.InTableAll[pieceId];
             if (IsHisTurn(piece) == false) return;
             piece.GetPiece().PerformMove(cell, piece);
         }
-        [NetworkCallable] public void ConfirmPromotionNetwork(byte id) {
+        [NetworkCallable] public void ConfirmPromotionNetwork(byte id, byte promotionPiece, byte promotionDestination) {
+            this.promotionPiece = promotionPiece;
+            this.promotionDestination = promotionDestination;
             ConfirmPromotion(id);
         }
         [NetworkCallable] public void AskAboutUpdate() {
@@ -485,8 +492,9 @@ namespace Andrey04o.Chess {
             VRCPlayerApi owner = Networking.GetOwner(gameObject);
             float ownerLength = Vector3.Distance(owner.GetPosition(), ownerManager.transform.position);
             Debug.Log("owner length " + ownerLength + " < " + ownerManager.transform.lossyScale.x);
-            if (ownerLength < ownerManager.transform.localScale.x) return false;
+            if (ownerLength < ownerManager.transform.lossyScale.x) return false;
             float reqLength = Vector3.Distance(requestedOwner.GetPosition(), ownerManager.transform.position);
+            Debug.Log("owner length " + ownerLength + " < reqLength" + reqLength);
             return reqLength < ownerLength;
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
@@ -500,13 +508,8 @@ namespace Andrey04o.Chess {
             base.OnDeserialization();
             UnpackSyncData();
             PerformEnPassant();
-            UpdatePromotion();
-            if (isStalemate == 0) return;
-            if (isStalemate == 1) {
-                Debug.Log("STALEMATE");
-            } else {
-                Debug.Log("CHECKMATE");
-            }
+            //UpdatePromotion();
+            PerformShowVisual();
         }
     }
 }

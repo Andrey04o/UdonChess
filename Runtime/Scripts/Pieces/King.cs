@@ -57,7 +57,7 @@ namespace Andrey04o.Chess {
             if (cell.pieceCurrent == null) return false;
             return true;
         }
-        public void CheckCastlingKingside(Piece piece) {
+        public void CheckCastlingKingside(Piece piece, bool addMove = true) {
             Cell cell;
             //Debug.Log("queenside");
             cell = piece.GetCurrentCell();
@@ -67,11 +67,12 @@ namespace Andrey04o.Chess {
             if (cell.IsAttacking(piece)) return;
             cell.castling = 1;
             cell = cell.GetLeft();
+            if (addMove == false) return;
             if (cell.pieceCurrent != null && cell.pieceCurrent.isNotMoved == 0) {
                 piece.gameField.AddMove(piece.GetCurrentCell().GetLeft().GetLeft()); 
             }
         }
-        public void CheckCastlingQueenside(Piece piece) {
+        public void CheckCastlingQueenside(Piece piece, bool addMove = true) {
             Cell cell;
             cell = piece.GetCurrentCell();
             if (GetRightEmpty(ref cell)) return;
@@ -81,6 +82,7 @@ namespace Andrey04o.Chess {
             cell.castling = 2;
             if (GetRightEmpty(ref cell)) return;
             cell = cell.GetRight();
+            if (addMove == false) return;
             if (cell.pieceCurrent != null && cell.pieceCurrent.isNotMoved == 0) {
                 piece.gameField.AddMove(piece.GetCurrentCell().GetRight().GetRight()); 
             }
@@ -88,6 +90,8 @@ namespace Andrey04o.Chess {
         bool castling = false;
         public override void PerformMove(Cell cell, Piece piece)
         {
+            CheckCastlingKingside(piece, false);
+            CheckCastlingQueenside(piece, false);
             if (piece.isNotMoved == 0) {
                 if (cell.castling != 0)
                     castling = true;

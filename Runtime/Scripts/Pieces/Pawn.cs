@@ -56,11 +56,13 @@ namespace Andrey04o.Chess {
                 piece.ShowPromotion(true, cell.position);
                 return;
             }
-            if (cell.pieceEnPassant != null) {
-                piece.gameField.AddRemovePiece(cell.pieceEnPassant);
+            if (Networking.IsOwner(Networking.LocalPlayer, piece.gameField.gameObject)) {
+                if (cell == gameField.enPassantCell) {
+                    piece.gameField.AddRemovePiece(gameField.enPassantPiece);
+                }
             }
             base.PerformMove(cell, piece);
-            if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject) == false) return;
+            if (Networking.IsOwner(Networking.LocalPlayer, piece.gameField.gameObject) == false) return;
             Cell cell1;
             cell1 = piece.GetCurrentCellPrevious();
             cell1 = cell1.GetNeighbour(piece.forward);

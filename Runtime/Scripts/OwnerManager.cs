@@ -15,6 +15,7 @@ namespace Andrey04o.Chess {
         public bool imIn = false;
         public VRCPlayerApi currentOwner;
         public TextMeshPro text1;
+        public GameObject visual;
         public void BecomeOwner() {
             Networking.SetOwner(Networking.LocalPlayer, gameField.gameObject);
         }
@@ -31,7 +32,7 @@ namespace Andrey04o.Chess {
         public void SetPiecesCollision(bool value) {
             foreach (Piece piece in gameField.pieces.InTableAll) {
                 if (piece.isCaptured == 0) {
-                    piece.meshCollider.enabled = value;
+                    piece.ShowPiece(Quaternion.identity);
                 }
             }
         }
@@ -42,6 +43,7 @@ namespace Andrey04o.Chess {
                 SetButtons(true);
                 SetTouchControls(true);
                 SetPiecesCollision(true);
+                visual.gameObject.SetActive(true);
                 BecomeOwner();
             }
             base.OnPlayerTriggerEnter(player);
@@ -54,6 +56,7 @@ namespace Andrey04o.Chess {
                 SetButtons(false);
                 SetTouchControls(false);
                 SetPiecesCollision(false);
+                visual.gameObject.SetActive(false);
             }
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
@@ -72,12 +75,9 @@ namespace Andrey04o.Chess {
                 SetButtons(false);
                 SetTouchControls(false);
                 SetPiecesCollision(false);
+                visual.gameObject.SetActive(false);
             }
         }
-        public void ShowButtons() {
-
-        }
-        
     }
 
 }

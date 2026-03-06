@@ -43,6 +43,7 @@ namespace Andrey04o.Chess {
         public bool is2DMode = false;
         public byte originalPosition = 0;
         public byte originalIndexType = 0;
+        public byte indexTypePrevious = 0;
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }
@@ -50,6 +51,8 @@ namespace Andrey04o.Chess {
             return gameField.cells[positionPrevious];
         }
         public void ChangeType(byte indexType) {
+            if (isCaptured == 1) return;
+            if (indexTypePrevious == indexType) return;
             Piece piece = gameField.pieces.GetPiece(indexType);
             if (piece != null) {
                 meshFilter.sharedMesh = piece.meshFilter.sharedMesh;
@@ -57,6 +60,7 @@ namespace Andrey04o.Chess {
                 offset = piece.offset;
                 meshRenderer.gameObject.transform.localPosition = offset;
                 this.indexType = indexType;
+                indexTypePrevious = indexType;
                 if (isBlack) spriteRenderer.sprite  = piece.spriteBlack;
                 else spriteRenderer.sprite = piece.spriteWhite;
             }
@@ -114,14 +118,15 @@ namespace Andrey04o.Chess {
             if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject)) {
                 gameField.ConfirmPromotion(id);
             } else {
-                NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)gameField, NetworkEventTarget.Owner, nameof(GameField.ConfirmPromotionNetwork), id);
+                NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)gameField, NetworkEventTarget.Owner, nameof(GameField.ConfirmPromotionNetwork), id, gameField.promotionPiece, gameField.promotionDestination);
+                gameField.UpdatePromotion();
             }
         }
         virtual public void PerformMove(Cell cell, Piece piece) {
             
-            if (Networking.IsOwner(Networking.LocalPlayer, gameField.gameObject) == false) {
-                NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)gameField, NetworkEventTarget.Owner, nameof(GameField.PerformMoveNetwork), cell.position, this.id);
-                cell.PlacePiece(this);
+            if (Networking.IsOwner(Networking.LocalPlayer, piece.gameField.gameObject) == false) {
+                NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)piece.gameField, NetworkEventTarget.Owner, nameof(GameField.PerformMoveNetwork), cell.position, piece.id);
+                cell.PlacePiece(piece);
                 return;
             }
             
