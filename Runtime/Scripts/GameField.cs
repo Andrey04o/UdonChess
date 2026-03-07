@@ -416,6 +416,11 @@ namespace Andrey04o.Chess {
                 Debug.Log("CHECKMATE");
             }
         }
+        public void ShowPromotion() {
+            if (promotionPiece != byte.MaxValue) {
+                pieces.InTableAll[promotionPiece].promotion.Show();
+            }
+        }
         public void SetPromotion(Piece piece, byte destination) {
             promotionPiece = piece.id;
             promotionDestination = destination;
@@ -464,9 +469,10 @@ namespace Andrey04o.Chess {
             }
             RequestSerialization();
             UnpackSyncData();
+            PerformShowVisual();
         }
         public void PerformShowVisual() {
-            visualInterface.ShowWinnerWindow(isStalemate, indexSideTurn == 1);
+            visualInterface.ShowWinnerWindow(isStalemate, indexSideTurn == 0);
             visualInterface.ShowTurn(indexSideTurn == 1);
         }
         [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {

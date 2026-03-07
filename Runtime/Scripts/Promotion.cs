@@ -10,6 +10,8 @@ namespace Andrey04o.Chess {
         public Piece piece;
         public Quaternion rotation;
         public VRCRotationConstraint rotationConstraint;
+        public bool is2DMode = false;
+        public bool isShow = false;
         public void SetPromotion(byte id) {
             piece.ConfirmPromotion(id);
         }
@@ -18,11 +20,26 @@ namespace Andrey04o.Chess {
         }
         public void ChangeRotation(Quaternion rotation) {
             rotationConstraint.ActivateConstraint();
+            is2DMode = true;
         }
         public void ResetRotation() {
             //rotationConstraint.ZeroConstraint();
             rotationConstraint.IsActive = false;
             transform.localRotation = rotation;
+            is2DMode = false;
+        }
+        public void Show(bool value) {
+            isShow = value;
+            Show();
+        }
+        public void Show() {
+            gameObject.SetActive(isShow);
+            if (isShow == false) return;
+            if (is2DMode) {
+                ChangeRotation(Quaternion.identity);
+            } else {
+                ResetRotation();
+            }
         }
         
     }

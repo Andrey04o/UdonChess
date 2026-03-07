@@ -45,15 +45,25 @@ namespace Andrey04o.Chess {
             {
                 case 0:
                     winnerWindow.SetActive(false);
+                    settings.winnerWindow.SetActive(false);
                     return;
                 case 1:
                     winnerWindow.SetActive(true);
+                    settings.winnerWindow.SetActive(true);
                     textMeshWinner.text = "Stalemate";
+                    settings.textMeshWinner.text = "Stalemate";
                     return;
                 case 2:
                     winnerWindow.SetActive(true);
-                    if (isBlack) textMeshWinner.text = "Black won";
-                    else textMeshWinner.text = "White won";
+                    settings.winnerWindow.SetActive(true);
+                    if (isBlack) {
+                        textMeshWinner.text = "Black won";
+                        settings.textMeshWinner.text = "Black won";
+                    }
+                    else {
+                        textMeshWinner.text = "White won";
+                        settings.textMeshWinner.text = "White won";
+                    }
                     return;
                 default:
                     return;

@@ -101,7 +101,7 @@ namespace Andrey04o.Chess {
             if (value == true) isShowPromotion = 1;
             else isShowPromotion = 0;
             gameField.SetPromotion(this, destination);
-            promotion.gameObject.SetActive(value);
+            promotion.Show(value);
         }
         public void CancelPromotion() {
             ShowPromotion(false, byte.MaxValue);

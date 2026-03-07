@@ -46,6 +46,7 @@ namespace Andrey04o.RaycastButton {
             gameField.isTouchMode = false;
             gameField.is2DMode = true;
             gameField.ShowPieces(desktopControl.transform.rotation);
+            gameField.ShowPromotion();
 
             camera.enabled = true;
             isDesktopMode = true;
@@ -61,6 +62,7 @@ namespace Andrey04o.RaycastButton {
 
             gameField.is2DMode = false;
             gameField.ShowPieces(Quaternion.identity);
+            gameField.ShowPromotion();
 
             camera.enabled = false;
             isDesktopMode = false;

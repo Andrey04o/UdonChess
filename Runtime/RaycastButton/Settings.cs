@@ -19,6 +19,8 @@ namespace Andrey04o.RaycastButton {
         public GameObject interfaceWindowHided;
         public Quaternion lookUp;
         public Quaternion lookDown;
+        public GameObject winnerWindow;
+        public TextMeshProUGUI textMeshWinner;
         void Update()
         {
             if (Input.GetMouseButtonDown(1)) {
