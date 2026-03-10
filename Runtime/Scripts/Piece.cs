@@ -63,11 +63,10 @@ namespace Andrey04o.Chess {
                 else spriteRenderer.sprite = moveSet.spriteWhite;
             }
         }
-        public void StartGrab(TileRaycastHandler handler) {
+        public void StartGrab(bool isVR) {
             if (gameField.IsHisTurn(this) == false) return;
-            if (handler != null) handler.currentPiece = this;
             gameField.CancelPromotion();
-            if (handler != null) pieceGrab.StartGrab(handler.hitPosition);
+            //if (!isVR) pieceGrab.StartGrab(gameField.hitPosition);
             gameField.CheckKing();
             gameField.CheckKingSafe(this); // 2
             gameField.SetCellsToCheck2();

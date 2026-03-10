@@ -20,6 +20,9 @@ namespace Andrey04o.Chess {
             transform_move.position = cursor.position;
             transform_move.position += (offsetGrab + piece.offset) * transform.lossyScale.y;
             piece.objectSync.transform.position = transform_move.position;
+            if (Input.GetMouseButtonUp(0)) {
+                piece.gameField.DropPiece();
+            }
             //piece.objectSync.TeleportTo(transform_move);
         }
         public void StartGrab(Transform cursor) {
@@ -27,6 +30,8 @@ namespace Andrey04o.Chess {
             if (Networking.IsOwner(Networking.LocalPlayer, piece.objectSync.gameObject) == false) {
                 Networking.SetOwner(Networking.LocalPlayer, piece.objectSync.gameObject);
             }
+            Debug.Log("grabb");
+            //piece.gameField.GrabPiece(piece);
             this.cursor = cursor;
             isGrab = true;
         }

@@ -47,6 +47,46 @@ namespace Andrey04o.Chess {
         public bool is2DMode;
         public bool isTouchMode;
         public VisualInterface visualInterface;
+        public Piece pieceHolding;
+        public Transform hitPosition;
+        public RaycastButton.Cell cellHovered;
+        public void GrabPiece(Piece piece, bool isVR = false) {
+            Debug.Log("grabpiece");
+            if (pieceHolding != null) pieceHolding.StopGrab(null);
+            pieceHolding = piece;
+            pieceHolding.StartGrab(false);
+            if (!isVR) pieceHolding.pieceGrab.StartGrab(hitPosition);
+        }
+        public void DropPiece() {
+            Debug.Log("piecedropp");
+            if (pieceHolding != null) {
+                Debug.Log("pieceholding != null");
+                if (cellHovered != null) {
+                    Debug.Log("piecedropp, " + cellHovered.name);
+                    pieceHolding.StopGrab(cellHovered.cell);
+                }
+                else
+                    pieceHolding.StopGrab(null);
+                SetHoveredCell(null);
+                pieceHolding = null;
+            }
+        }
+        public void SetHoveredCell(RaycastButton.Cell cell, bool justRemove = false) {
+            if (justRemove) {
+                if (cellHovered == cell) {
+                    cellHovered.VisuallyRemove();
+                    cellHovered = null;
+                }
+                return;
+            }
+            if (cellHovered != null) {
+                cellHovered.VisuallyRemove();
+            }
+            cellHovered = cell;
+        }
+        public void RemoveCell() {
+
+        }
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
                 if (piece.isBlack == false) {
@@ -281,7 +321,6 @@ namespace Andrey04o.Chess {
                 cell.attackByCount = syncData[offset++];
                 cell.attackByCountBlack = syncData[offset++];
                 cell.attackVector = syncData[offset++];
-                cell.OnDeserialization();
             }
         }
         public void CheckStalemate() {

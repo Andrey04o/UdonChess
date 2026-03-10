@@ -59,7 +59,7 @@ namespace Andrey04o.RaycastButton {
         }
         #endif
 
-        override public void OnRaycastEnter()
+        override public void OnRaycastEnter(bool isUnityMouse = false)
         {
             // Check if the colliding object is from CursorController
                 isCursorHovering = true;
@@ -102,7 +102,7 @@ namespace Andrey04o.RaycastButton {
         }
         */
 
-        public override void OnRaycastExit()
+        public override void OnRaycastExit(bool isUnityMouse = false)
         {
             // Check if the cursor left this button
                 isCursorHovering = false;

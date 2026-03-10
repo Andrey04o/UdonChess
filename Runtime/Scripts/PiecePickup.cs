@@ -10,16 +10,20 @@ namespace Andrey04o.Chess {
         public override void OnPickup()
         {
             base.OnPickup();
-            piece.StartGrab(null);
+            piece.gameField.GrabPiece(piece, true);
+            //piece.StartGrab(true);
         }
         public override void OnDrop()
         {
             base.OnDrop();
+            piece.gameField.DropPiece();
+            /*
             if (cellCurrent != null) {
                 piece.StopGrab(cellCurrent.cell);
             } else {
                 piece.StopGrab(null);
             }
+            */
             
         }
         public void AddCell(RaycastButton.Cell cell) {

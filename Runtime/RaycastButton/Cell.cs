@@ -9,31 +9,44 @@ namespace Andrey04o.RaycastButton {
         public Chess.Cell cell;
         public MeshRenderer meshRenderer;
         public Material materialHighlight;
-        public override void OnRaycastEnter()
+        public override void OnRaycastEnter(bool isUnityMouse = false)
         {
-            base.OnRaycastEnter();
+            base.OnRaycastEnter(isUnityMouse);
+            if (isUnityMouse && cell.gameField.is2DMode) return;
+            cell.gameField.SetHoveredCell(this);
             meshRenderer.material.Lerp(cell.materialCurrent, materialHighlight, 0.5f);
-            
-
+            if (isUnityMouse) MoveHitPosition();
         }
-        public override void OnRaycastExit()
+        public override void OnRaycastExit(bool isUnityMouse = false)
         {
-            base.OnRaycastExit();
+            base.OnRaycastExit(isUnityMouse);
+            if (isUnityMouse && cell.gameField.is2DMode) return;
+            cell.gameField.SetHoveredCell(this, true);
+        }
+        public void VisuallyRemove() {
             meshRenderer.material = cell.materialCurrent;
         }
-        public override void OnRaycastDrag(TileRaycastHandler handler)
+        public override void OnRaycastDrag(bool isUnityMouse = false)
         {
-            base.OnRaycastDrag(handler);
+            base.OnRaycastDrag(isUnityMouse);
+            if (isUnityMouse && cell.gameField.is2DMode) return;
             if (cell.pieceCurrent != null) {
-                cell.pieceCurrent.StartGrab(handler);
+                //pieceGrab.StartGrab(gameField.hitPosition);
+                cell.gameField.GrabPiece(cell.pieceCurrent);
+                //cell.pieceCurrent.StartGrab(false);
             }
         }
-        public override void OnRaycastMouseUp(TileRaycastHandler handler)
+        public override void OnRaycastMouseUp(bool isUnityMouse = false)
         {
-            base.OnRaycastMouseUp(handler);
-            if (handler.currentPiece != null) {
-                handler.currentPiece.StopGrab(cell);
+            base.OnRaycastMouseUp();
+            if (isUnityMouse && cell.gameField.is2DMode) return;
+            if (cell.gameField.pieceHolding != null) {
+                cell.gameField.pieceHolding.StopGrab(cell);
+                cell.gameField.pieceHolding = null;
             }
+        }
+        void MoveHitPosition() {
+            cell.gameField.hitPosition.position = transform.position;
         }
     }
 }

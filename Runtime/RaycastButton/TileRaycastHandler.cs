@@ -18,7 +18,7 @@ namespace Andrey04o.RaycastButton {
         private RaycastButton _currentHoveredTile;
         private RaycastButton _lastHoveredTile;
         public Transform pointDragTransfrom;
-        public Transform hitPosition;
+        public GameField gameField;
         [HideInInspector] public Piece currentPiece;
         private bool isHold = false;
         
@@ -57,7 +57,7 @@ namespace Andrey04o.RaycastButton {
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, tileLayerMask))
             {
-                hitPosition.position = hit.point;
+                gameField.hitPosition.position = hit.point;
                 RaycastButton tile = hit.collider.GetComponent<RaycastButton>();
                 
                 if (tile != null)
@@ -83,10 +83,10 @@ namespace Andrey04o.RaycastButton {
                     if (Input.GetMouseButtonDown(0))
                     {
                         tile.OnRaycastClick();
-                        tile.OnRaycastDrag(this);
+                        tile.OnRaycastDrag();
                     }
                     if (Input.GetMouseButtonUp(0)) {
-                        MouseUp();
+                        //MouseUp();
                     }
                 }
                 else
@@ -102,7 +102,7 @@ namespace Andrey04o.RaycastButton {
             }
             if (Input.GetMouseButtonUp(0)) {
                 isHold = false;
-                MouseUp();
+                //MouseUp();
             }
         }
 
@@ -117,23 +117,22 @@ namespace Andrey04o.RaycastButton {
         }
 
         public void MouseUp() {
-            Debug.Log("mouseup");
+            gameField.DropPiece();
             if (_currentHoveredTile != null) {
-                Debug.Log("_currentHoveredTile.OnRaycastMouseUp(this);");
-                _currentHoveredTile.OnRaycastMouseUp(this);
+                _currentHoveredTile.OnRaycastMouseUp();
                 currentPiece = null;
             } else if (_lastHoveredTile != null) {
-                Debug.Log("_lastHoveredTile.OnRaycastExit();");
                 _lastHoveredTile.OnRaycastExit();
                 _lastHoveredTile = null;
             }
             _currentHoveredTile = null;
-
+            /*
             if (currentPiece != null) {
                 Debug.Log("currentPiece.StopGrab(null);");
                 currentPiece.StopGrab(null);
                 currentPiece = null;
             }
+            */
         }
     }
 }

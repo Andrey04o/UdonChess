@@ -30,10 +30,6 @@ namespace Andrey04o.Chess {
         [HideInInspector] public bool isCheck = false;
         [HideInInspector] public bool isCheck2 = false;
         [HideInInspector] public bool isInAttack = false;
-        public TextMeshPro text1;
-        public TextMeshPro text2;
-        public TextMeshPro text3;
-        public TextMeshPro text4;
         Piece[] piecesVector = new Piece[8];
         public byte piecesVectorCount;
         public byte isCalculatedAttacks = 0;
@@ -144,8 +140,6 @@ namespace Andrey04o.Chess {
                 if (piece.isBlack) attackByCountBlack--;
                 else attackByCount--;
             }
-            text1.text = attackByCount + "";
-            text2.text = attackByCountBlack + "";
         }
         public void RemoveAttack() {
             attackByCount = 0;
@@ -285,25 +279,16 @@ namespace Andrey04o.Chess {
         public void SetAttackVector(Vector2Int dir, bool isAttack) {
             
             int bitPosition = GetBitPositionFromDirection(dir);
-            text3.text = "";
             if (bitPosition >= 0) {
                 if (isAttack)
                 attackVector |= (byte)(1 << bitPosition);
                 else {
                     attackVector &= (byte)(~(1 << bitPosition) & 0xFF);
                 }
-                
             }
-            for (int bitPosition1 = 0; bitPosition1 < 8; bitPosition1++) {
-                // Check if this direction has an attack vector
-                if ((attackVector & (1 << bitPosition1)) == 0) continue;
-                text3.text += GetTextFromDirection(bitPosition1) + "/";
-            }
-            
         }
         public void VectorGetPieces(Piece piece, bool isKingCheck = false, bool checkKingSafe = false) {
             // Check if this cell has an attack vector
-            text4.text = "0";
             piecesVectorCount = 0;
             if (attackVector == 0) return;
             // Iterate through all 8 directions (bits 0-7)
@@ -312,7 +297,6 @@ namespace Andrey04o.Chess {
                 if ((attackVector & (1 << bitPosition)) == 0) continue;
                 
                 Vector2Int negativeMovement = GetDirectionFromBitPosition(bitPosition) * -1;
-                text4.text += GetTextFromDirection(bitPosition) + "/";
                 // Find the piece by moving in the negative direction
                 Cell neighbourCell = this;
                 for(;;) {
@@ -475,23 +459,6 @@ namespace Andrey04o.Chess {
                 case 1: return "Down-Right";
                 case 0: return "Down-Left";
                 default: return "-1";
-            }
-        }
-
-        public override void OnDeserialization()
-        {
-            base.OnDeserialization();
-            text1.text = attackByCount + "";
-            text2.text = attackByCountBlack + "";
-            text3.text = "";
-            if (pieceCurrent != null) {
-                //text4.text = pieceCurrent.GetPiece().name;
-            } else text4.text = "empty";
-            for (int bitPosition = 0; bitPosition < 8; bitPosition++) {
-                // Check if this direction has an attack vector
-                if ((attackVector & (1 << bitPosition)) == 0) continue;
-                text3.text += GetTextFromDirection(bitPosition) + "/";
-                
             }
         }
         public void UpdateInfo() {
