@@ -227,21 +227,19 @@ MonoBehaviour:
   attackByCountBlack: 0
   attackVector: 0
   materialNormal: {fileID: 2100000, guid: bb26f617d9a20c04cb622d64814ccc85, type: 2}
+  materialNormalNormal: {fileID: 0}
   materialAttack: {fileID: 2100000, guid: 58345ec5d3a114c4f965add4f3a6db83, type: 2}
   materialAttackColored: {fileID: 2100000, guid: bb26f617d9a20c04cb622d64814ccc85,
     type: 2}
   materialCurrent: {fileID: 2100000, guid: bb26f617d9a20c04cb622d64814ccc85, type: 2}
   materialOrange: {fileID: 2100000, guid: c21298d0f0af89e4bb6f5a491683b178, type: 2}
+  materialGray: {fileID: 2100000, guid: e6c5538bc2bf001439c358b2f39bbae7, type: 2}
   meshRenderer: {fileID: 5758033615302892007}
   isCanMoveHere: 0
   castling: 0
   isCheck: 0
   isCheck2: 0
   isInAttack: 0
-  text1: {fileID: 0}
-  text2: {fileID: 0}
-  text3: {fileID: 0}
-  text4: {fileID: 0}
   piecesVectorCount: 0
   isCalculatedAttacks: 0
 --- !u!114 &8665354615439167949

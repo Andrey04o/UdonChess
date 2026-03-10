@@ -19,6 +19,8 @@ namespace Andrey04o.Chess {
         [UdonSynced] public byte isKingCheck = 0;
         [UdonSynced] public byte pieceAttackKing = byte.MaxValue;
         [UdonSynced] public byte isStalemate = 0;
+        [UdonSynced] public byte idPreviousPositionMoved;
+        [UdonSynced] public byte idPositionMoved;
         byte[] dirMove = new byte[27];
         public byte dirMoveCount = 0;
         public byte[] syncDataOriginal = new byte[512];
@@ -50,12 +52,22 @@ namespace Andrey04o.Chess {
         public Piece pieceHolding;
         public Transform hitPosition;
         public RaycastButton.Cell cellHovered;
+        bool isPiecePickedUp = false;
+        public AudioClip audioPlace;
+        public AudioClip audioNext;
+        public AudioClip audioCheck;
+        public AudioSource audioSource;
+        Piece pieceAttackKingPiece;
+        Cell cellPreviousPositionMoved;
+        Cell cellPositionMoved;
         public void GrabPiece(Piece piece, bool isVR = false) {
             Debug.Log("grabpiece");
+            if (isPiecePickedUp) return;
             if (pieceHolding != null) pieceHolding.StopGrab(null);
             pieceHolding = piece;
             pieceHolding.StartGrab(false);
             if (!isVR) pieceHolding.pieceGrab.StartGrab(hitPosition);
+            else isPiecePickedUp = true;
         }
         public void DropPiece() {
             Debug.Log("piecedropp");
@@ -70,6 +82,7 @@ namespace Andrey04o.Chess {
                 SetHoveredCell(null);
                 pieceHolding = null;
             }
+            isPiecePickedUp = false;
         }
         public void SetHoveredCell(RaycastButton.Cell cell, bool justRemove = false) {
             if (justRemove) {
@@ -240,6 +253,12 @@ namespace Andrey04o.Chess {
             piecesMoveDestination[piecesMoveCount] = destination;
             piecesMoveCount++;
         }
+        public void SetPreviousPosition(Piece piece) {
+            idPreviousPositionMoved = piece.GetCurrentCell().position;
+        }
+        public void SetPosition(Cell cell) {
+            idPositionMoved = cell.position;
+        }
         public void UpdateRemovePiece() {
             for (int i = 0; i < piecesToRemoveCount; i++) {
                 piecesToRemove[i].GetCurrentCell().isCalculatedAttacks = 1;
@@ -271,6 +290,11 @@ namespace Andrey04o.Chess {
             PerformShowVisual();
             ResetCellsCheck();
             PackSyncData();
+            PlaySound();
+
+            DrawCellPreviousPosition();
+            DrawCellPosition();
+            DrawCellAttackKing();
             RequestSerialization();
         }
         
@@ -311,6 +335,7 @@ namespace Andrey04o.Chess {
                 piece.PerformCapture(false);
                 if (piece.isCaptured == 0) {
                     cells[piece.position].PlacePieceLocal(piece);
+                    piece.PlaySound();
                     cells[piece.position].pieceCurrent = piece;
                 }
                 piece.ChangeType(piece.indexType);
@@ -503,6 +528,8 @@ namespace Andrey04o.Chess {
             isStalemate = 0;
             promotionPiece = byte.MaxValue;
             promotionDestination = byte.MaxValue;
+            idPreviousPositionMoved = byte.MaxValue;
+            idPositionMoved = byte.MaxValue;
             for (int i = 0; i < syncData.Length; i++) {
                 syncData[i] = syncDataOriginal[i];
             }
@@ -513,6 +540,42 @@ namespace Andrey04o.Chess {
         public void PerformShowVisual() {
             visualInterface.ShowWinnerWindow(isStalemate, indexSideTurn == 0);
             visualInterface.ShowTurn(indexSideTurn == 1);
+        }
+        public void DrawCellAttackKing() {
+            if (pieceAttackKingPiece != null) {
+                if (pieceAttackKingPiece != cellPositionMoved)
+                    pieceAttackKingPiece.GetCurrentCell().RestoreColor();
+            }
+            if (pieceAttackKing != byte.MaxValue) {
+                pieceAttackKingPiece = pieces.InTableAll[pieceAttackKing];
+                pieceAttackKingPiece.GetCurrentCell().SetColorKingAttack();
+            }
+        }
+        public void DrawCellPreviousPosition() {
+            if (cellPreviousPositionMoved != null) {
+                cellPreviousPositionMoved.RestoreColor();
+            }
+            if (idPreviousPositionMoved != byte.MaxValue) {
+                cellPreviousPositionMoved = cells[idPreviousPositionMoved];
+                cellPreviousPositionMoved.SetColorPreviousPosition();
+            }
+        }
+        public void DrawCellPosition() {
+            if (cellPositionMoved != null) {
+                cellPositionMoved.RestoreColor();
+            }
+            if (idPositionMoved != byte.MaxValue) {
+                cellPositionMoved = cells[idPositionMoved];
+                cellPositionMoved.SetColorPreviousPosition();
+            }
+        }
+        public void PlaySound() {
+            if (isKingCheck > 0) {
+                audioSource.clip = audioCheck;
+            } else {
+                audioSource.clip = audioNext;
+            }
+            audioSource.Play();
         }
         [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
             Cell cell = cells[cellId];
@@ -554,6 +617,11 @@ namespace Andrey04o.Chess {
             PerformEnPassant();
             //UpdatePromotion();
             PerformShowVisual();
+            PlaySound();
+            
+            DrawCellPreviousPosition();
+            DrawCellPosition();
+            DrawCellAttackKing();
         }
     }
 }

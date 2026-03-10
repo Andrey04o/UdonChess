@@ -42,6 +42,7 @@ namespace Andrey04o.Chess {
         public byte originalPosition = 0;
         public byte originalIndexType = 0;
         public byte indexTypePrevious = 0;
+        public AudioSource audioSource;
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }
@@ -91,6 +92,13 @@ namespace Andrey04o.Chess {
                 cell.PlacePiece(this);
             }
         }
+        public void PlaySound() {
+            Debug.Log("sound " + positionPrevious + " " + position);
+            if (positionPrevious != position) {
+                audioSource.clip = gameField.audioPlace;
+                audioSource.Play();
+            }
+        }
         public void PromotionCheck() {
             if (GetPiece() == gameField.pieces.pawn) {
 
@@ -119,6 +127,7 @@ namespace Andrey04o.Chess {
             positionPrevious = position;
             gameField.cells[position].pieceCurrent = null;
             position = cell.position;
+            PlaySound();
             isNotMoved = 1;
             //isMoved = true;
             cell.PlacePiece(this);

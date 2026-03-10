@@ -81,14 +81,16 @@ namespace Andrey04o.Chess {
                     
                     if (cell != null)
                     {
-                        if ((cells2.Count + lines.Count) % 2 == 0) {
+                        if ((cells2.Count + lines.Count) % 2 == 1) {
                             cell.meshRenderer.sharedMaterial = materialBlack;
                             cell.materialNormal = materialBlack;
+                            cell.materialNormalNormal = materialBlack;
                             cell.materialCurrent = materialBlack;
                             cell.materialAttackColored = materialBlack;
                         } else {
                             cell.meshRenderer.sharedMaterial = materialWhite;
                             cell.materialNormal = materialWhite;
+                            cell.materialNormalNormal = materialWhite;
                             cell.materialCurrent = materialWhite;
                             cell.materialAttackColored = materialWhite;
                         }
@@ -135,6 +137,9 @@ namespace Andrey04o.Chess {
             Debug.Log(pieces.InTableAll.Length);
             Debug.Log(piecesList.Count);
             gameField.promotionPiece = byte.MaxValue;
+            gameField.pieceAttackKing = byte.MaxValue;
+            gameField.idPreviousPositionMoved = byte.MaxValue;
+            gameField.idPositionMoved = byte.MaxValue;
             EditorUtility.SetDirty(pieces);
             gameField.CalcAttacks();
             foreach(Cell cell in cells2) {

@@ -15,20 +15,18 @@ namespace Andrey04o.Chess {
         public GameObject arrowTurnWhite;
         public TextMeshProUGUI textMeshArrowBlack;
         public TextMeshProUGUI textMeshArrowWhite;
-        Quaternion quaternion;
+        public Quaternion quaternionUp;
+        public Quaternion quaternionDown;
         Vector3 rotation;
         public Settings settings;
         public void ShowTurn(bool isBlack) {
-            quaternion = arrowTurnBlack.transform.rotation;
-                rotation = quaternion.eulerAngles;
             if (isBlack) {
-                rotation.z = 180;
+                arrowTurnBlack.transform.rotation = quaternionDown;
+                arrowTurnWhite.transform.rotation = quaternionDown;
             } else {
-                rotation.z = -180;
+                arrowTurnBlack.transform.rotation = quaternionUp;
+                arrowTurnWhite.transform.rotation = quaternionUp;
             }
-            quaternion.eulerAngles = rotation;
-            arrowTurnBlack.transform.rotation = quaternion;
-            arrowTurnWhite.transform.rotation = quaternion;
 
             if (isBlack) {
                 textMeshArrowBlack.text = "Your turn";

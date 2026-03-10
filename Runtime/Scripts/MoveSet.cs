@@ -27,7 +27,9 @@ namespace Andrey04o.Chess {
             if (cell.pieceCurrent != null) {
                 piece.gameField.AddRemovePiece(cell.pieceCurrent);
             }
+            piece.gameField.SetPreviousPosition(piece);
             piece.gameField.AddChangePosition(piece, cell);
+            piece.gameField.SetPosition(cell);
 
             piece.gameField.MakeMove();
         }

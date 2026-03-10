@@ -20,10 +20,12 @@ namespace Andrey04o.Chess {
         public byte attackByCountBlack; //s
         public byte attackVector; //s
         public Material materialNormal;
+        public Material materialNormalNormal;
         public Material materialAttack;
         public Material materialAttackColored;
         public Material materialCurrent;
         public Material materialOrange;
+        public Material materialGray;
         public MeshRenderer meshRenderer;
         [HideInInspector] public bool isCanMoveHere = false;
         [HideInInspector] public byte castling = 0;
@@ -227,6 +229,19 @@ namespace Andrey04o.Chess {
             }
             meshRenderer.material = materialCurrent;
         }
+        public void SetColorKingAttack() {
+            materialNormal = materialOrange;
+            SetMaterial(0);
+        }
+        public void SetColorPreviousPosition() {
+            materialNormal = materialGray;
+            SetMaterial(0);
+        }
+        public void RestoreColor() {
+            materialNormal = materialNormalNormal;
+            SetMaterial(0);
+        }
+ 
 
         public Cell[] GetSlidingCells(Vector2Int direction)
         {
@@ -317,8 +332,6 @@ namespace Andrey04o.Chess {
                 gameField.AddChangedCell(neighbourCell);
                 piecesVector[piecesVectorCount] = neighbourPiece;
                 piecesVectorCount++;
-
-                neighbourCell.meshRenderer.material = materialOrange;
             }
         }
         
