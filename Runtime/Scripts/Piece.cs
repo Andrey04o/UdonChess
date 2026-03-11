@@ -218,5 +218,18 @@ namespace Andrey04o.Chess {
                 meshCollider.enabled = false;
             }
         }
+        public void ShowCollider() {
+            if (isCaptured == 0) {
+                meshCollider.enabled = true;
+                if (gameField.is2DMode) {
+                    meshCollider.enabled = false;
+                }
+                if (gameField.isTouchMode) {
+                    meshCollider.enabled = false;
+                }
+            } else {
+                meshCollider.enabled = false;
+            }
+        }
     }
 }

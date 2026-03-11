@@ -20,6 +20,7 @@ namespace Andrey04o.Chess {
             
             if (Networking.IsOwner(Networking.LocalPlayer, piece.gameField.gameObject) == false) {
                 NetworkCalling.SendCustomNetworkEvent((IUdonEventReceiver)piece.gameField, NetworkEventTarget.Owner, nameof(GameField.PerformMoveNetwork), cell.position, piece.id);
+                Networking.SetOwner(Networking.LocalPlayer, piece.gameField.gameObject);
                 cell.PlacePiece(piece);
                 return;
             }
@@ -30,6 +31,14 @@ namespace Andrey04o.Chess {
             piece.gameField.SetPreviousPosition(piece);
             piece.gameField.AddChangePosition(piece, cell);
             piece.gameField.SetPosition(cell);
+
+            if (piece.gameField.settings.isAutoLock == true) {
+                if (piece.isBlack) {
+                    piece.gameField.lockerBlack.Lock();
+                } else {
+                    piece.gameField.lockerWhite.Lock();
+                }
+            }
 
             piece.gameField.MakeMove();
         }

@@ -313,7 +313,7 @@ GameObject:
   - component: {fileID: 5575832531404907952}
   - component: {fileID: 2194111909822443178}
   - component: {fileID: 7460594158456442653}
-  m_Layer: 13
+  m_Layer: 2
   m_Name: CellTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}

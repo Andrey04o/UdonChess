@@ -30,12 +30,14 @@ namespace Andrey04o.Chess {
             if (Networking.IsOwner(Networking.LocalPlayer, piece.objectSync.gameObject) == false) {
                 Networking.SetOwner(Networking.LocalPlayer, piece.objectSync.gameObject);
             }
-            Debug.Log("grabb");
+            if (Networking.LocalPlayer.IsUserInVR() == false)
+                piece.gameField.ShowPieceColliders(false);
             //piece.gameField.GrabPiece(piece);
             this.cursor = cursor;
             isGrab = true;
         }
         public void StopGrab() {
+            piece.gameField.ShowPieceColliders(true);
             gameObject.SetActive(false);
             cursor = null;
             isGrab = false;

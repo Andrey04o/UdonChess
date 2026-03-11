@@ -18,7 +18,7 @@ namespace Andrey04o.Chess {
         public Quaternion quaternionUp;
         public Quaternion quaternionDown;
         Vector3 rotation;
-        public Settings settings;
+        public DesktopControls desktopControls;
         public void ShowTurn(bool isBlack) {
             if (isBlack) {
                 arrowTurnBlack.transform.rotation = quaternionDown;
@@ -35,7 +35,7 @@ namespace Andrey04o.Chess {
                 textMeshArrowBlack.text = "White turn";
                 textMeshArrowWhite.text = "Your turn";
             }
-            settings.ChandeSide(isBlack);
+            desktopControls.ChandeSide(isBlack);
         }
 
         public void ShowWinnerWindow(byte stalemate, bool isBlack = true) {
@@ -43,24 +43,24 @@ namespace Andrey04o.Chess {
             {
                 case 0:
                     winnerWindow.SetActive(false);
-                    settings.winnerWindow.SetActive(false);
+                    desktopControls.winnerWindow.SetActive(false);
                     return;
                 case 1:
                     winnerWindow.SetActive(true);
-                    settings.winnerWindow.SetActive(true);
+                    desktopControls.winnerWindow.SetActive(true);
                     textMeshWinner.text = "Stalemate";
-                    settings.textMeshWinner.text = "Stalemate";
+                    desktopControls.textMeshWinner.text = "Stalemate";
                     return;
                 case 2:
                     winnerWindow.SetActive(true);
-                    settings.winnerWindow.SetActive(true);
+                    desktopControls.winnerWindow.SetActive(true);
                     if (isBlack) {
                         textMeshWinner.text = "Black won";
-                        settings.textMeshWinner.text = "Black won";
+                        desktopControls.textMeshWinner.text = "Black won";
                     }
                     else {
                         textMeshWinner.text = "White won";
-                        settings.textMeshWinner.text = "White won";
+                        desktopControls.textMeshWinner.text = "White won";
                     }
                     return;
                 default:

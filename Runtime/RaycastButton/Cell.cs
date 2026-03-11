@@ -31,6 +31,7 @@ namespace Andrey04o.RaycastButton {
             base.OnRaycastDrag(isUnityMouse);
             if (isUnityMouse && cell.gameField.is2DMode) return;
             if (cell.pieceCurrent != null) {
+                if (cell.gameField.IsCanUse(cell.pieceCurrent) == false) return;
                 //pieceGrab.StartGrab(gameField.hitPosition);
                 cell.gameField.GrabPiece(cell.pieceCurrent);
                 //cell.pieceCurrent.StartGrab(false);

@@ -21,7 +21,10 @@ namespace Andrey04o.RaycastButton {
         bool isDesktopMode;
         Quaternion rotation;
         Vector3 rotationEuler;
-        public Settings settings;
+        public DesktopControls desktopControls;
+        public Locker lockerWhite;
+        public Locker lockerBlack;
+        Locker lockerCurrent;
         bool currentSide;
         public void Enter(bool side) {
             currentSide = side;
@@ -37,9 +40,14 @@ namespace Andrey04o.RaycastButton {
             blockerInteraction.gameObject.SetActive(true);
             blockerInteraction.transform.position = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
             Networking.LocalPlayer.Immobilize(true);
-            if (!side) station.UseStation(Networking.LocalPlayer);
-            else stationBlack.UseStation(Networking.LocalPlayer);
-            settings.Show(true, side);
+            if (!side) {
+                station.UseStation(Networking.LocalPlayer);
+                lockerCurrent = lockerWhite;
+            } else {
+                stationBlack.UseStation(Networking.LocalPlayer);
+                lockerCurrent = lockerBlack;
+            }
+            desktopControls.Show(true, lockerCurrent, side);
             desktopControl.SetActive(true);
             DisableInteractive = true;
             
@@ -57,7 +65,7 @@ namespace Andrey04o.RaycastButton {
             Networking.LocalPlayer.Immobilize(false);
             if (!currentSide) station.ExitStation(Networking.LocalPlayer);
             else stationBlack.ExitStation(Networking.LocalPlayer);
-            settings.Show(false);
+            desktopControls.Hide();
             DisableInteractive = false;
 
             gameField.is2DMode = false;

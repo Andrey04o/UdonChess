@@ -29,8 +29,13 @@ namespace Andrey04o.RaycastButton {
                 }
             #endif
         }
-        public void ShowButton() {
-            buttonInteractive.SetActive(!isInUse);
+        public void ShowButton(bool value = true) {
+            if (value == false) {
+                buttonInteractive.SetActive(false);
+            } else {
+                buttonInteractive.SetActive(!isInUse);
+            }
+            
         }
 
     }

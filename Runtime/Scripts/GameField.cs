@@ -57,6 +57,9 @@ namespace Andrey04o.Chess {
         public AudioClip audioNext;
         public AudioClip audioCheck;
         public AudioSource audioSource;
+        public Settings settings;
+        public Locker lockerBlack;
+        public Locker lockerWhite;
         Piece pieceAttackKingPiece;
         Cell cellPreviousPositionMoved;
         Cell cellPositionMoved;
@@ -99,6 +102,14 @@ namespace Andrey04o.Chess {
         }
         public void RemoveCell() {
 
+        }
+        public bool IsCanUse(Piece piece) {
+            if (piece.isBlack) {
+                return lockerBlack.IsCanUse();
+            } else {
+                return lockerWhite.IsCanUse();
+            }
+            return true;
         }
         public bool IsHisTurn(Piece piece) {
             if (indexSideTurn == 0) {
@@ -576,6 +587,15 @@ namespace Andrey04o.Chess {
                 audioSource.clip = audioNext;
             }
             audioSource.Play();
+        }
+        public void ShowPieceColliders(bool value) {
+            foreach (Piece piece in pieces.InTableAll) {
+                if (value == false) {
+                    piece.meshCollider.enabled = false;
+                } else {
+                    piece.ShowCollider();
+                }
+            }
         }
         [NetworkCallable] public void PerformMoveNetwork(byte cellId, byte pieceId) {
             Cell cell = cells[cellId];

@@ -25,6 +25,8 @@ namespace Andrey04o.Chess {
         public GameObject aboutPage;
         public Locker lockerBlack;
         public Locker lockerWhite;
+        public GameObject settingsPage;
+        public Settings settings;
         public void Press() {
             if (gameField.isStalemate > 0) {
                 Restart();
@@ -64,11 +66,14 @@ namespace Andrey04o.Chess {
         }
         public void Show(bool value) {
             gameObject.SetActive(value);
+            ShowDesktopButtons(true);
+        }
+        public void ShowDesktopButtons(bool value) {
             #if UNITY_STANDALONE
             if (value == true) {
                 if (Networking.LocalPlayer.IsUserInVR() == false) {
                     foreach(Station station in stations) {
-                        station.ShowButton();
+                        station.ShowButton(settings.isShowDesktopButton);
                     }
                 }
             }
@@ -76,6 +81,9 @@ namespace Andrey04o.Chess {
         }
         public void ToggleAbout() {
             aboutPage.SetActive(!aboutPage.activeSelf);
+        }
+        public void ToggleSettings() {
+            settingsPage.SetActive(!settingsPage.activeSelf);
         }
     }
 }

@@ -506,19 +506,19 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: settings
+      Data: desktopControls
     - Name: $v
       Entry: 7
       Data: 24|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: settings
+      Data: desktopControls
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 25|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.Settings, com.andrey04o.chess
+      Data: Andrey04o.RaycastButton.DesktopControls, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 
