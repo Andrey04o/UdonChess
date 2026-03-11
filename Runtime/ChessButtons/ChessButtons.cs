@@ -23,6 +23,8 @@ namespace Andrey04o.Chess {
         public StationDesktopView stationDesktopView;
         public Station[] stations;
         public GameObject aboutPage;
+        public Locker lockerBlack;
+        public Locker lockerWhite;
         public void Press() {
             if (gameField.isStalemate > 0) {
                 Restart();
@@ -53,6 +55,12 @@ namespace Andrey04o.Chess {
         }
         public void DesktopModeBlack() {
             stationDesktopView.Enter(true);
+        }
+        public void LockerWhite() {
+            lockerWhite.Use();
+        }
+        public void LockerBlack() {
+            lockerBlack.Use();
         }
         public void Show(bool value) {
             gameObject.SetActive(value);

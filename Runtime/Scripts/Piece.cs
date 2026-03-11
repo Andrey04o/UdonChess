@@ -43,6 +43,12 @@ namespace Andrey04o.Chess {
         public byte originalIndexType = 0;
         public byte indexTypePrevious = 0;
         public AudioSource audioSource;
+        public void EnablePickup(bool value) {
+            if (value == false) {
+                pickup.Drop();
+            }
+            pickup.enabled = value;
+        }
         public Cell GetCurrentCell() {
             return gameField.cells[position];
         }

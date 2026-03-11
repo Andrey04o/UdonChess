@@ -36,6 +36,8 @@ namespace Andrey04o.Chess {
         public Canvas canvasDesktop;
         public ChessButtons chessButtons;
         public OwnerManager ownerManager;
+        public Locker lockerWhite;
+        public Locker lockerBlack;
         private Transform gridContainer;
         #if UNITY_EDITOR
         public void GenerateGrid()
@@ -158,11 +160,15 @@ namespace Andrey04o.Chess {
             gameField.syncDataOriginal = gameField.syncData;
             gameField.ownerManager = ownerManager;
             ownerManager.gameField = gameField;
+            lockerWhite.gameField = gameField;
+            lockerBlack.gameField = gameField;
             EditorUtility.SetDirty(gameField);
             EditorUtility.SetDirty(ownerManager);
             EditorUtility.SetDirty(cameraDesktop);
             EditorUtility.SetDirty(stationDesktopView);
-
+            EditorUtility.SetDirty(lockerWhite);
+            EditorUtility.SetDirty(lockerBlack);
+            
             chessButtons.gameField = gameField;
             EditorUtility.SetDirty(chessButtons);
         }
