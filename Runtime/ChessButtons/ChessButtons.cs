@@ -1,5 +1,4 @@
-﻿
-using Andrey04o.RaycastButton;
+﻿using Andrey04o.Chess.RaycastButton;
 using TMPro;
 using UdonSharp;
 using UnityEngine;

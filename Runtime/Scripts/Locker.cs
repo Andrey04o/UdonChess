@@ -5,7 +5,7 @@ using UdonSharp;
 using VRC.SDKBase;
 using TMPro;
 using UnityEngine.UI;
-using Andrey04o.RaycastButton;
+using Andrey04o.Chess.RaycastButton;
 namespace Andrey04o.Chess {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class Locker : UdonSharpBehaviour

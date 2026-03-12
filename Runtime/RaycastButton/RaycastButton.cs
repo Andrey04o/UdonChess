@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class RaycastButton : UdonSharpBehaviour
     {

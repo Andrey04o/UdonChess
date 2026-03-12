@@ -5,7 +5,7 @@ using UdonSharp;
 using Andrey04o.Chess;
 using VRC.SDKBase;
 using VRC.SDK3.Components;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TouchControls : UdonSharpBehaviour
     {

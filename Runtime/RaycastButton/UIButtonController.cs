@@ -10,7 +10,7 @@ using VRC.Udon.Common;
 //using UdonSharpEditor;
 using UnityEditor;
 #endif
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     public class UIButtonController : RaycastButton
     {
         

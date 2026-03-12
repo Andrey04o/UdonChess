@@ -4,7 +4,7 @@ using UnityEngine;
 using UdonSharp;
 using VRC.Udon.Common;
 using VRC.SDK3.UdonNetworkCalling;
-using Andrey04o.RaycastButton;
+using Andrey04o.Chess.RaycastButton;
 using VRC.SDKBase;
 namespace Andrey04o.Chess {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]

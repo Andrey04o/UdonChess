@@ -6,7 +6,7 @@ using TMPro;
 using UnityEngine.UI;
 using Andrey04o.Chess;
 
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class Settings : UdonSharpBehaviour
     {

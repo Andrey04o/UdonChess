@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
 using TMPro;
-using Andrey04o.RaycastButton;
+using Andrey04o.Chess.RaycastButton;
 namespace Andrey04o.Chess {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 

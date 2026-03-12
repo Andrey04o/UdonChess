@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UdonSharp;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class ChangeValueSlider : UdonSharpBehaviour
     {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UdonSharpEditor;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [CustomEditor(typeof(UIButtonController))]
     public class UIButtonControllerEditor : Editor
     {

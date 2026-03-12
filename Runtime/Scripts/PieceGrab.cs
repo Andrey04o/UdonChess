@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
-using Andrey04o.RaycastButton;
+using Andrey04o.Chess.RaycastButton;
 using VRC.SDK3.Components;
 using VRC.SDKBase;
 namespace Andrey04o.Chess {

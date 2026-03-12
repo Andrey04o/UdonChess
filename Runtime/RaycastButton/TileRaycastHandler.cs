@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using TMPro;
 using UnityEngine.UI;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class TileRaycastHandler : UdonSharpBehaviour
     {

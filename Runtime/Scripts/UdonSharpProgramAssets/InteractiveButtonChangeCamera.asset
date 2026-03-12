@@ -21,7 +21,7 @@ MonoBehaviour:
   compiledVersion: 2
   behaviourSyncMode: 1
   hasInteractEvent: 0
-  scriptID: 7944838998349099126
+  scriptID: -6650765165038227813
   serializationData:
     SerializedFormat: 2
     SerializedBytes: 
@@ -542,7 +542,7 @@ MonoBehaviour:
       Data: 29|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.DesktopControls, com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.DesktopControls, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 

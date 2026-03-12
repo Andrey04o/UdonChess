@@ -374,7 +374,7 @@ MonoBehaviour:
       Data: 19|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.TouchControls, com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.TouchControls, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 
@@ -428,7 +428,7 @@ MonoBehaviour:
       Data: 22|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.StationDesktopView, com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.StationDesktopView, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 
@@ -482,7 +482,7 @@ MonoBehaviour:
       Data: 25|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.Station[], com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.Station[], com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 
@@ -746,7 +746,7 @@ MonoBehaviour:
       Data: 39|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.Settings, com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.Settings, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 

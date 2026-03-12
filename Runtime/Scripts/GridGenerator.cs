@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using VRC;
-using Andrey04o.RaycastButton;
+using Andrey04o.Chess.RaycastButton;
 
 #if UNITY_EDITOR
 using UnityEditor;

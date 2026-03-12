@@ -3,12 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UdonSharp;
 using VRC.SDKBase;
-using Andrey04o.Chess;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using VRC.SDK3.Components;
-using VRC.SDK3.Dynamics.Constraint.Components;
-namespace Andrey04o.RaycastButton {
+namespace Andrey04o.Chess.RaycastButton {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class StationDesktopView : UdonSharpBehaviour
     {

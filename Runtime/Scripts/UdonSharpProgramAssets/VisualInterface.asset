@@ -458,7 +458,7 @@ MonoBehaviour:
       Data: 21|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: Andrey04o.RaycastButton.DesktopControls, com.andrey04o.chess
+      Data: Andrey04o.Chess.RaycastButton.DesktopControls, com.andrey04o.chess
     - Name: 
       Entry: 8
       Data: 

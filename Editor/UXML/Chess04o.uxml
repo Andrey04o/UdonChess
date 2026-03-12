@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/UdonChess/Editor/UXML/VisualElement.uss?fileID=7433441132597879392&amp;guid=89b644ecaefc59c449760f5eb0873119&amp;type=3#VisualElement" />
+    <ui:VisualElement class="section" style="flex-grow: 1; width: auto; height: 50%;">
+        <ui:VisualElement focusable="false" name="VisualElement" style="background-image: url(&quot;project://database/Assets/UdonChess/Runtime/Sprites/Chess04o.png?fileID=21300000&amp;guid=e40885322b774b6468ab6c347e254244&amp;type=3#Chess04o&quot;); align-items: center; align-self: center; overflow: visible; visibility: visible; display: flex; -unity-background-scale-mode: scale-to-fit; width: 100%; height: 100%;" />
+    </ui:VisualElement>
+    <ui:Label tabindex="5" text="Developed by Andrey04o&#10;Thank you for using &lt;b&gt;Chess04o&lt;/b&gt; package&#10;&#10;Links:&#10;&lt;a href=&quot;https://github.com/Andrey04o/Chess04o&quot;&gt;Github page&lt;/a href&gt;&#10;&lt;a href=&quot;https://04o.booth.pm/items/8060674&quot;&gt;Booth page&lt;/a href&gt;&#10;&lt;a href=&quot;https://vrchat.com/home/user/usr_fee3cab2-a580-4da8-a002-b5f37c7c7b6f&quot;&gt;VRChat profile&lt;/a href&gt;&#10;&lt;a href=&quot;https://patreon.com/04o&quot;&gt;Patreon&lt;/a href&gt;&#10;&lt;a href=&quot;https://boosty.to/04o&quot;&gt;Boosty&lt;/a href&gt;&#10;&lt;a href=&quot;https://andrey04o.itch.io/&quot;&gt;itch.io&lt;/a href&gt;" parse-escape-sequences="true" display-tooltip-when-elided="true" class="section" style="-unity-text-align: upper-center; height: auto; font-size: 18px; white-space: normal;" />
+    <ui:VisualElement class="section" style="flex-grow: 1; height: auto;">
+        <uie:PropertyField name="CameraPropertyField" binding-path="cameraDesktop" style="height: 140px;" />
+        <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="LabelCameraProperties" style="white-space: normal; -unity-text-align: middle-center;" />
+        <ui:Button text="Change the camera scale and size" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonCameraChangeSize" class="buttonChess04o" style="padding-bottom: 6px;" />
+    </ui:VisualElement>
+</ui:UXML>
