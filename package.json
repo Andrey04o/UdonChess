@@ -1,0 +1,13 @@
+{
+  "name": "com.andrey04o.chess04o",
+  "displayName": "Chess04o",
+  "version": "1.0.0",
+  "unity": "2022.3",
+  "description": "Chess for VRChat",
+  "vrchatVersion": "2022.1.1",
+  "author": {
+    "name": "Andrey04o",
+    "email": "cool.dddaa@yandex.ru",
+    "url": "https://andrey04o.itch.io/"
+  }
+}
